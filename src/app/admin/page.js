@@ -1,6 +1,17 @@
+
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import LogoutButton from './LogoutButton';
+//import LogoutButton from './LogoutButton';
+import Menu from "@/components/layout/menu"
+import PlantInfoCard from "./PlantInfoCard"
+import NilaInfoCard from "./NilaInfoCard"
+import LeleInfoCard from "./LeleInfoCard"
+
+const menuOps = [
+  { name: "Data", href: "/data", icon: "/nav-icon/log-f.svg" },
+  { name: "Home", href: "/", icon: "/nav-icon/home-f.svg" },
+  { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
+];
 
 export default function AdminPage() {
   const cookieStore = cookies();
@@ -10,10 +21,17 @@ export default function AdminPage() {
     redirect('/login');
   }
 
+
   return (
-    <div>
-      <h1>Halaman Admin</h1>
-      <LogoutButton />
+    <div className="pb-32">
+      <Menu opsi={menuOps}/>
+
+      <div className="flex flex-col gap-6 p-6">
+        <PlantInfoCard></PlantInfoCard>
+        <NilaInfoCard></NilaInfoCard>
+        <LeleInfoCard></LeleInfoCard>
+      </div>
+
     </div>
   );
 }
