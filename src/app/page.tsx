@@ -10,16 +10,27 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
 ];
 
+interface MyDataJsonType {
+  type: string;
+  plantingDate: string;
+  harvestDate: string;
+  hari : string
+  start : string
+  end : string
+  pin : string
+}
+
 export default function Home() {
+
+  /*===============================CEK STATUS CLIENT================================================*/
   const [data_H, setData_H] = useState<{status: boolean} | null>(null);
   const [data_N, setData_N] = useState<{status: boolean} | null>(null);
   const [data_L, setData_L] = useState<{status: boolean} | null>(null);
-  
   useEffect(() => {
     const endpoints = [
-      { url: "/api/hidroponik/post", setter: setData_H, label: "data_H" },
-      { url: "/api/kolam-ikan-nila/post", setter: setData_N, label: "data_N" },
-      { url: "/api/kolam-ikan-lel/post", setter: setData_L, label: "data_L" },
+      { url: "/api/hidroponik", setter: setData_H, label: "data_H" },
+      { url: "/api/kolam-ikan-nila", setter: setData_N, label: "data_N" },
+      { url: "/api/kolam-ikan-lele", setter: setData_L, label: "data_L" },
     ];
   
     const intervals = endpoints.map(({ url, setter, label }) => {
@@ -31,12 +42,40 @@ export default function Home() {
       };
     
       fetchData();
-      return setInterval(fetchData, 5000);
+      return setInterval(fetchData, 10000);
     });
   
     return () => intervals.forEach(clearInterval);
   }, []);
 
+  /*===============================MENGAMBIL JADWAL================================================*/
+  const [dataJson_H, setDataJson_H] = useState<MyDataJsonType | null>(null);
+  const [dataJson_H_list, setDataJson_H_list] = useState<MyDataJsonType[]>([]);
+  const [dataJson_N, setDataJson_N] = useState<MyDataJsonType[]>([]);
+  const [dataJson_L, setDataJson_L] = useState<MyDataJsonType[]>([]);
+  useEffect(() => {
+    const fetchList = [
+      { file: 'hidroponik', key: 'plantInfo', setter: setDataJson_H },
+      { file: 'hidroponik', key: 'jadwal', setter: setDataJson_H_list },
+      { file: 'kolam-ikan-nila', key: 'jadwal', setter: setDataJson_N },
+      { file: 'kolam-ikan-lele', key: 'jadwal', setter: setDataJson_L },
+    ];
+
+    fetchList.forEach(async ({ file, key, setter }) => {
+      try {
+        const res = await fetch(`/api/data-get?file=${file}`);
+        if (res.ok) {
+          const json = await res.json();
+          console.log(json[key]);
+          setter(json[key]);
+        } else {
+          console.error(`Gagal fetch data dari ${file}`);
+        }
+      } catch (err) {
+        console.error(`Error saat fetch ${file}:`, err);
+      }
+    });
+  }, []);
 
   return (
     <div className="overflow-y-auto h-full w-full pb-18 text-[#424242]">
@@ -53,9 +92,21 @@ export default function Home() {
             infoTitle="Info Tanaman"
             status={data_H?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Tanam", value: "--:--" },
-              { label: "Jadwal Tanam", value: "--:--" },
-              { label: "Perkiraan Panen", value: "--:--" },
+              { label: "Jenis Tanam", value: dataJson_H?.type ?? "--:--"},
+              { label: "Jadwal Tanam", value: dataJson_H?.harvestDate ?? "--:--" },
+              { label: "Perkiraan Panen", value: dataJson_H?.plantingDate ?? "--:--" },
+              {
+                label: "Jadwal Pencahayaan",
+                value: (
+                  <ul className="list-disc pl-4 space-y-1">
+                    {dataJson_H_list.map((item, i) => (
+                      <li key={i}>
+                        {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                      </li>
+                    ))}
+                  </ul>
+                ),
+              }
             ]}
           />
 
@@ -82,16 +133,20 @@ export default function Home() {
             infoTitle="Info & Jadwal Pakan"
             status={data_N?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Ikan", value: "--:--" },
+              { label: "Jenis Ikan", value: "Nila" },
               {
-                label: "Jadwal Pakan",
+                label: "Jadwal Pencahayaan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {Array(7)
-                      .fill("--:--")
-                      .map((v, i) => (
-                        <li key={i}>{v}</li>
-                      ))}
+                    {dataJson_N.length > 0 ? (
+                      dataJson_N.map((item, i) => (
+                        <li key={i}>
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak ada jadwal</li>
+                    )}
                   </ul>
                 ),
               },
@@ -107,16 +162,20 @@ export default function Home() {
             infoTitle="Info & Jadwal Pakan"
             status={data_L?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Ikan", value: "--:--" },
+              { label: "Jenis Ikan", value: "Lele" },
               {
                 label: "Jadwal Pakan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {Array(7)
-                      .fill("--:--")
-                      .map((v, i) => (
-                        <li key={i}>{v}</li>
-                      ))}
+                    {dataJson_L.length > 0 ? (
+                      dataJson_L.map((item, i) => (
+                        <li key={i}>
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak ada jadwal</li>
+                    )}
                   </ul>
                 ),
               },

@@ -1,5 +1,6 @@
 'use client';
-import { useState } from "react";
+
+import { useState, useEffect } from 'react';
 
 const hariOptions = [
   "Senin",
@@ -11,183 +12,355 @@ const hariOptions = [
   "Minggu",
 ];
 
-export default function JadwalPakan() {
+export default function LeleInfoCard() {
+  const [isEditing, setIsEditing] = useState(false);
+  const [LeleInfo, setLeleInfo] = useState({
+    type: '--',
+    ikanHidup: '--:--',
+    ikanMati: '--:--',
+  });
+
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Jadwal sekarang array objek { hari, waktu }
-  const [jadwal, setJadwal] = useState([
-  ]);
-	console.log("Data jadwal sekarang:", jadwal);
+  const [jadwal, setJadwal] = useState([]);
+  const [newHari, setNewHari] = useState("");
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
+  const [newPin, setNewPin] = useState("");
 
-  // State input baru hari & waktu
-  const [newHari, setNewHari] = useState("Senin");
-  const [newWaktu, setNewWaktu] = useState("");
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLeleInfo((prev) => ({ ...prev, [name]: value }));
+  };
 
-  function toggleEdit() {
-    setIsEditMode(!isEditMode);
-  }
-
-  function hapusJadwal(idx) {
-    setJadwal((prev) => prev.filter((_, i) => i !== idx));
-  }
-
-  // Validasi apakah jadwal baru sudah ada
-  function isDuplicate(hari, waktu) {
+  // Cek jadwal duplikat hari + start + end + pin
+  const isDuplicate = (hari, start, end, pin) => {
     return jadwal.some(
-      (item) => item.hari === hari && item.waktu === waktu
+      (item) =>
+        item.hari === hari &&
+        item.start === start &&
+        item.end === end &&
+        item.pin === pin
     );
-  }
+  };
 
-  function tambahJadwal() {
-    if (newWaktu && !isDuplicate(newHari, newWaktu)) {
+  // fungsi menambahkan jadwal
+  const tambahJadwal = () => {
+    if (
+      newStartTime &&
+      newEndTime &&
+      newPin !== "" &&
+      !isDuplicate(newHari, newStartTime, newEndTime, newPin)
+    ) {
       setJadwal((prev) =>
-        [...prev, { hari: newHari, waktu: newWaktu }].sort((a, b) => {
-          // Urutkan berdasarkan hari dulu, baru waktu
+        [...prev, { hari: newHari, start: newStartTime, end: newEndTime, pin: newPin }].sort((a, b) => {
           const hariA = hariOptions.indexOf(a.hari);
           const hariB = hariOptions.indexOf(b.hari);
           if (hariA !== hariB) return hariA - hariB;
-          return a.waktu.localeCompare(b.waktu);
+          return a.start.localeCompare(b.start);
         })
       );
-      setNewWaktu("");
-      setNewHari("Senin");
+      setNewStartTime("");
+      setNewEndTime("");
+      setNewHari("");
+      setNewPin("");
     }
+  };
+
+  const hapusJadwal = (idx) => {
+    setJadwal((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const data = {
+    LeleInfo : LeleInfo,
+    jadwal : jadwal
   }
 
-	// Tambahkan handleSave
-	function handleSave() {
-	  // Contoh: lakukan sesuatu untuk simpan data, lalu keluar dari mode edit
-	  setIsEditMode(false);
-	  // Bisa tambah logic simpan ke backend atau validasi di sini
-	}
+  // menyimpan hasil edit dan menyimpan data
+  const handleSave = () => {
+    setIsEditing(false);
+    setIsEditMode(false);
+    sendToJson();
+    console.log("Data disimpan:", { data });
+  };
+  // fungsi simpan jadwal
+  async function sendToJson() {
+    const res = await fetch('/api/data-put?file=kolam-ikan-lele', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+      
+    })
+    const result = await res.json();
+    console.log(result.message);
+  }
 
+  // sinkronasi jadwal
+  useEffect(() => {
+    async function fetchJadwal() {
+      try {
+        const res = await fetch('/api/data-get?file=kolam-ikan-lele');
+        if (res.ok) {
+          const data = await res.json();
+          setLeleInfo(data["LeleInfo"]);
+          setJadwal(data["jadwal"]);
+        } else {
+          console.error('Gagal fetch data jadwal');
+        }
+      } catch (error) {
+        console.error('Error saat fetch jadwal:', error);
+      }
+    }
+    fetchJadwal();
+  }, []);
 
   return (
     <div className="hover:bg-[#f7f7f7] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] w-full mx-auto overflow-hidden text-[#424242]">
-        <div className={`bg-blue-600 bg-opacity-50 p-4`}>
-          <div className="flex items-center mb-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 mr-3 stroke-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
-            <h1 className="text-white text-2xl font-semibold">Kolam Ikan Lele</h1>
-          </div>
-          <p className="text-white">Atur jadwal pemberian pakan otomatis</p>
+      <div className="bg-blue-600 bg-opacity-50 p-4">
+        <div className="flex items-center mb-1">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-8 w-8 mr-3 stroke-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+          </svg>
+          <h1 className="text-white text-2xl font-semibold">Kolam Ikan Lele</h1>
         </div>
+        <p className="text-white">Atur jadwal pakan dan catat perkembangan ikan</p>
+      </div>
+
       <div className="flex flex-col space-y-1.5 p-6">
         <div className="flex justify-between items-center">
-          <h3 className="tracking-tight text-md font-semibold flex items-center">
+          <h3 className="tracking-tight text-2xl font-semibold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              className="h-5 w-5 mr-2 text-green-600"
               fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-calendar-clock h-5 w-5 mr-2 text-blue-600"
             >
-              <path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"></path>
-              <path d="M16 2v4"></path>
-              <path d="M8 2v4"></path>
-              <path d="M3 10h5"></path>
-              <path d="M17.5 17.5 16 16.3V14"></path>
-              <circle cx="16" cy="16" r="6"></circle>
+              <path d="M8 2v4M16 2v4M3 10h18M3 4a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2H5a2 2 0 01-2-2V4z" />
             </svg>
-            Info &amp; Jadwal Pakan
+            Info Ikan
           </h3>
-
-					<div className="flex gap-2">
-					  {!isEditMode ? (
-					    <button
-					      onClick={toggleEdit}
-					      className="h-10 w-10 text-green-600 hover:text-green-700"
-					      aria-label="Edit Jadwal Pakan"
-					    >
-					      <svg
-					        xmlns="http://www.w3.org/2000/svg"
-					        className="h-5 w-5 mx-auto"
-					        fill="none"
-					        viewBox="0 0 24 24"
-					        stroke="currentColor"
-					      >
-					        <path d="M12 20h9" />
-					        <path d="M16.38 3.62a1 1 0 013 3L7.37 18.63a2 2 0 01-.86.51l-2.87.84a.5.5 0 01-.62-.62l.84-2.87a2 2 0 01.51-.86z" />
-					      </svg>
-					    </button>
-					  ) : (
-					    <button
-					      onClick={handleSave}
-					      className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
-					    >
-					      Simpan
-					    </button>
-					  )}
-					</div>
-
+          <div className="flex gap-2">
+            {!isEditing ? (
+              <button
+                onClick={() => {
+                  setIsEditing(true);
+                  setIsEditMode(true);
+                }}
+                className="h-10 w-10 text-green-600 hover:text-green-700"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mx-auto"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M12 20h9M16.38 3.62a1 1 0 013 3L7.37 18.63a2 2 0 01-.86.51l-2.87.84a.5.5 0 01-.62-.62l.84-2.87a2 2 0 01.51-.86z" />
+                </svg>
+              </button>
+            ) : (
+              <button
+                onClick={handleSave}
+                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
+              >
+                Simpan
+              </button>
+            )}
+          </div>
         </div>
       </div>
-      <div className="p-6 pt-0 text-sm space-y-3">
-        <p>
-          <strong>Jenis Ikan:</strong> Nila
-        </p>
 
-        {!isEditMode && (
-          <div>
-            <label className="text-sm leading-none font-semibold">
-              Jadwal Pakan:
-            </label>
-            <ul className="list-disc list-inside ml-4 mt-1">
-              {jadwal.length === 0 ? (
-                <li>Tidak ada jadwal</li>
-              ) : (
-                jadwal.map((item, idx) => (
-                  <li key={idx}>
-                    <strong>{item.hari}:</strong> {item.waktu} (Otomatis)
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        )}
+      <div className="p-6 pt-0 text-xl space-y-3">
+        {/* Jenis Ikan */}
+        <div>
+          <label className="text-xl font-semibold block mb-1">Jenis Ikan:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name="type"
+              value={LeleInfo.type}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 w-full"
+            />
+          ) : (
+            <p>{LeleInfo.type}</p>
+          )}
+        </div>
 
-        {isEditMode && (
-          <div>
-            <label className="text-sm leading-none font-semibold">
-              Jadwal Pakan:
-            </label>
-            <div className="space-y-2 mt-1">
-              {jadwal.map((item, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
-                  <select
-                    value={item.hari}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setJadwal((prev) => {
-                        const copy = [...prev];
-                        copy[idx].hari = val;
-                        return copy.sort((a, b) => {
-                          const hariA = hariOptions.indexOf(a.hari);
-                          const hariB = hariOptions.indexOf(b.hari);
-                          if (hariA !== hariB) return hariA - hariB;
-                          return a.waktu.localeCompare(b.waktu);
+        {/* Ikan hidup */}
+        <div>
+          <label className="text-xl font-semibold block mb-1">Ikan Hidup:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name="ikanHidup"
+              value={LeleInfo.ikanHidup}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 w-full"
+            />
+          ) : (
+            <p>{LeleInfo.ikanHidup}</p>
+          )}
+        </div>
+
+        {/* Ikan Mati */}
+        <div>
+          <label className="text-xl font-semibold block mb-1">Ikan Mati:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name="ikanMati"
+              value={LeleInfo.ikanMati}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 w-full"
+            />
+          ) : (
+            <p>{LeleInfo.ikanMati}</p>
+          )}
+        </div>
+
+        <div className="space-y-3">
+          {!isEditMode && (
+            <div>
+              <label className="text-xl leading-none font-semibold">
+                Jadwal Pakan:
+              </label>
+              <ul className="list-disc list-inside ml-4 mt-1 text-base">
+                {jadwal.length === 0 ? (
+                  <li>Tidak ada jadwal</li>
+                ) : (
+                  jadwal.map((item, idx) => (
+                    <li key={idx}>
+                      <strong>{item.hari}:</strong> {item.start} -- {item.end} (Pin: {item.pin}) 
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          )}
+
+          {isEditMode && (
+            <div>
+              <label className="text-xl leading-none font-semibold">
+                Jadwal Pakan:
+              </label>
+              <div className="space-y-2 mt-1">
+                {jadwal.map((item, idx) => (
+                  <div key={idx} className="flex md:items-center space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={item.hari}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].hari = val;
+                          return newJadwal;
                         });
-                      });
-                    }}
-                    className="h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      }}
+                    >
+                      {hariOptions.map((h, i) => (
+                        <option key={i} value={h}>
+                          {h}
+                        </option>
+                      ))}
+                    </select>
+
+                    <input
+                      type="time"
+                      className="border rounded px-2 py-1 w-28"
+                      value={item.start}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].start = val;
+                          return newJadwal;
+                        });
+                      }}
+                      title="Jam Mulai"
+                    />
+
+                    <h1>--</h1>
+
+                    <input
+                      type="time"
+                      className="border rounded px-2 py-1 w-28"
+                      value={item.end}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].end = val;
+                          return newJadwal;
+                        });
+                      }}
+                      title="Jam Selesai"
+                    />
+
+                    <input
+                      type="number"
+                      min={0}
+                      max={40}
+                      className="border rounded px-2 py-1 w-28"
+                      value={item.pin}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].pin = val;
+                          return newJadwal;
+                        });
+                      }}
+                      placeholder="Pin"
+                      title="Nomor Pin GPIO"
+                    />
+
+                    <button
+                      onClick={() => hapusJadwal(idx)}
+                      className="inline-flex items-center border-1 border-red-500 justify-center h-10 w-10 rounded-md text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500"
+                      title="Hapus Jadwal"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-trash2 h-4 w-4"
+                      >
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                        <line x1="10" x2="10" y1="11" y2="17"></line>
+                        <line x1="14" x2="14" y1="11" y2="17"></line>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+
+                <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-2 md:gap-0">
+                  <select
+                    className="border rounded px-2 py-1"
+                    value={newHari}
+                    onChange={(e) => setNewHari(e.target.value)}
                   >
-                    {hariOptions.map((h) => (
-                      <option key={h} value={h}>
+                    {hariOptions.map((h, i) => (
+                      <option key={i} value={h}>
                         {h}
                       </option>
                     ))}
@@ -195,26 +368,39 @@ export default function JadwalPakan() {
 
                   <input
                     type="time"
-                    value={item.waktu}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setJadwal((prev) => {
-                        const copy = [...prev];
-                        copy[idx].waktu = val;
-                        return copy.sort((a, b) => {
-                          const hariA = hariOptions.indexOf(a.hari);
-                          const hariB = hariOptions.indexOf(b.hari);
-                          if (hariA !== hariB) return hariA - hariB;
-                          return a.waktu.localeCompare(b.waktu);
-                        });
-                      });
-                    }}
-                    className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
+                    className="border rounded px-2 py-1 w-28"
+                    value={newStartTime}
+                    onChange={(e) => setNewStartTime(e.target.value)}
+                    placeholder="Jam Mulai"
+                    title="Jam Mulai"
                   />
+
+                  <h1>--</h1>
+
+                  <input
+                    type="time"
+                    className="border rounded px-2 py-1 w-28"
+                    value={newEndTime}
+                    onChange={(e) => setNewEndTime(e.target.value)}
+                    placeholder="Jam Selesai"
+                    title="Jam Selesai"
+                  />
+
+                  <input
+                    type="number"
+                    min={0}
+                    max={40}
+                    className="border rounded px-2 py-1 w-28"
+                    value={newPin}
+                    onChange={(e) => setNewPin(e.target.value)}
+                    placeholder="Pin"
+                    title="Nomor Pin GPIO"
+                  />
+
                   <button
-                    onClick={() => hapusJadwal(idx)}
-                    className="inline-flex items-center justify-center h-10 w-10 rounded-md text-red-500 hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    aria-label={`Hapus jadwal ${item.hari} ${item.waktu}`}
+                    onClick={tambahJadwal}
+                    className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    aria-label="Tambah jadwal pakan"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -226,64 +412,19 @@ export default function JadwalPakan() {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="lucide lucide-trash2 h-4 w-4"
+                      className="lucide lucide-circle-plus h-4 w-4"
                     >
-                      <path d="M3 6h18"></path>
-                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                      <line x1="10" x2="10" y1="11" y2="17"></line>
-                      <line x1="14" x2="14" y1="11" y2="17"></line>
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M8 12h8"></path>
+                      <path d="M12 8v8"></path>
                     </svg>
                   </button>
+
                 </div>
-              ))}
+              </div>
             </div>
-
-            <div className="flex items-center space-x-2 mt-2">
-              <select
-                value={newHari}
-                onChange={(e) => setNewHari(e.target.value)}
-                className="h-10 rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              >
-                {hariOptions.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                type="time"
-                value={newWaktu}
-                onChange={(e) => setNewWaktu(e.target.value)}
-                className="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 w-full"
-                placeholder="HH:MM"
-              />
-              <button
-                onClick={tambahJadwal}
-                className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
-                aria-label="Tambah jadwal pakan"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-circle-plus h-4 w-4"
-                >
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M8 12h8"></path>
-                  <path d="M12 8v8"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

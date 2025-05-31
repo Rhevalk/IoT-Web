@@ -13,28 +13,29 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
 ];
 
-export default function Log() {
-  type ChartValue = { value: number };
+interface MyDataType {
+  status: boolean;
+  suhu_udara: number;
+  kelembapan_udara: number;
+  suhu_air: number;
+  tds: number;
+  debit: number;
+}
 
-  interface MyDataType {
-    status: boolean;
-    suhu_udara: number;
-    kelembapan_udara: number;
-    suhu_air: number;
-    tds: number;
-    debit: number;
-  }
+interface MyDataJsonType {
+  type: string;
+  plantingDate: string;
+  harvestDate: string;
+}
+
+type ChartValue = { value: number };
+
+export default function Log() {  
+  /*===============================MENGAMBIL DATA================================================*/
   const [data, setData] = useState<MyDataType | null>(null);
-
-  const [chartSuhu, setChartSuhu] = useState<ChartValue[]>([]);
-  const [chartKelembapan, setChartKelembapan] = useState<ChartValue[]>([]);
-  const [chartTds, setChartTds] = useState<ChartValue[]>([]);
-  const [chartDebit, setChartDebit] = useState<ChartValue[]>([]);
-  const [chartSuhuAir, setChartSuhuAir] = useState<ChartValue[]>([]);
-
   useEffect(() => {
     const fetchData = () => {
-      fetch("/api/hidroponik/post")
+      fetch("/api/hidroponik")
         .then((res) => res.json())
         .then((json) => setData(json))
         .catch((err) => console.error("Gagal ambil data:", err));
@@ -46,6 +47,32 @@ export default function Log() {
     
   }, []);
 
+  /*===============================MENGAMBIL JADWAL================================================*/
+  const [dataJson, setDataJson] = useState<MyDataJsonType | null>(null);
+  useEffect(() => {
+    async function fetchJadwal() {
+      try {
+        const res = await fetch('/api/data-get?file=hidroponik');
+        if (res.ok) {
+          const getJson = await res.json();
+          console.log(getJson["plantInfo"]);
+          setDataJson(getJson["plantInfo"]);
+        } else {
+          console.error('Gagal fetch data jadwal');
+        }
+      } catch (error) {
+        console.error('Error saat fetch jadwal:', error);
+      }
+    }
+    fetchJadwal();
+  }, []);
+
+  /*===============================MEMBUAT CHART================================================*/
+  const [chartSuhu, setChartSuhu] = useState<ChartValue[]>([]);
+  const [chartKelembapan, setChartKelembapan] = useState<ChartValue[]>([]);
+  const [chartTds, setChartTds] = useState<ChartValue[]>([]);
+  const [chartDebit, setChartDebit] = useState<ChartValue[]>([]);
+  const [chartSuhuAir, setChartSuhuAir] = useState<ChartValue[]>([]);
   useEffect(() => {
     if (!data) return;
 
@@ -88,9 +115,9 @@ export default function Log() {
             infoTitle="Info Tanaman"
             status={data?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Tanam", value: "--:--" },
-              { label: "Jadwal Tanam", value: "--:--" },
-              { label: "Perkiraan Panen", value: "--:--" },
+              { label: "Jenis Tanam", value: dataJson?.type ?? "--:--"},
+              { label: "Jadwal Tanam", value: dataJson?.plantingDate ?? "--:--" },
+              { label: "Perkiraan Panen", value: dataJson?.harvestDate ?? "--:--" },
             ]}
           />
           

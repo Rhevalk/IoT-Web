@@ -12,23 +12,28 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
 ];
 
+interface MyDataJsonType {
+  hari : string
+  start : string
+  end : string
+  pin : string
+}
+
+type ChartValue = { value: number };
+
+interface MyDataType {
+  status: boolean;
+  suhu_air: number;
+  debit: number;
+}
+
 export default function Log() {
-  type ChartValue = { value: number };
-
-  interface MyDataType {
-    status: boolean;
-    suhu_air: number;
-    debit: number;
-  }
+  
+  /*===============================CEK STATUS CLIENT================================================*/
   const [data, setData] = useState<MyDataType | null>(null);
-
-
-  const [chartDebit, setChartDebit] = useState<ChartValue[]>([]);
-  const [chartSuhuAir, setChartSuhuAir] = useState<ChartValue[]>([]);
-
   useEffect(() => {
     const fetchData = () => {
-      fetch("/api/kolam-ikan-Nila/post")
+      fetch("/api/kolam-ikan-Nila")
         .then((res) => res.json())
         .then((json) => setData(json))
         .catch((err) => console.error("Gagal ambil data:", err));
@@ -40,6 +45,9 @@ export default function Log() {
     
   }, []);
 
+  /*===============================GRAFIK KECIL================================================*/
+  const [chartSuhuAir, setChartSuhuAir] = useState<ChartValue[]>([]);
+  const [chartDebit, setChartDebit] = useState<ChartValue[]>([]);
   useEffect(() => {
     if (!data) return;
 
@@ -51,6 +59,26 @@ export default function Log() {
     }
 
   }, [data]);
+
+  /*===============================MENGAMBIL JADWAL================================================*/
+  const [dataJson, setDataJson] = useState<MyDataJsonType[]>([]);
+  useEffect(() => {
+    async function fetchJadwal() {
+      try {
+        const res = await fetch('/api/data-get?file=kolam-ikan-nila');
+        if (res.ok) {
+          const getJson = await res.json();
+          console.log(getJson["jadwal"]);
+          setDataJson(getJson["jadwal"]);
+        } else {
+          console.error('Gagal fetch data jadwal');
+        }
+      } catch (error) {
+        console.error('Error saat fetch jadwal:', error);
+      }
+    }
+    fetchJadwal();
+  }, []);
 
   return (
     <div className="flex flex-col h-screen text-[#424242]">
@@ -65,21 +93,25 @@ export default function Log() {
           <InfoCard
             href="/dashboard/kolam-ikan-nila"
             title="Kolam Ikan Nila"
-            color="orange"
-            subtitle="Monitoring kondisi ikan Nila"
+            color="blue"
+            subtitle="Monitoring kondisi ikan nila"
             infoTitle="Info & Jadwal Pakan"
             status={data?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Ikan", value: "--:--" },
+              { label: "Jenis Ikan", value: "Nila" },
               {
                 label: "Jadwal Pakan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {Array(7)
-                      .fill("--:--")
-                      .map((v, i) => (
-                        <li key={i}>{v}</li>
-                      ))}
+                    {dataJson.length > 0 ? (
+                      dataJson.map((item, i) => (
+                        <li key={i}>
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak ada jadwal</li>
+                    )}
                   </ul>
                 ),
               },
