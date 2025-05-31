@@ -71,7 +71,7 @@ export default function Log() {
   }, [data]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen text-[#424242]">
       <Menu opsi={menuOps}/>
 
       {/* Main Content */}

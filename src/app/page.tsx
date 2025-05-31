@@ -39,7 +39,7 @@ export default function Home() {
 
 
   return (
-    <div className="overflow-y-auto h-full w-full pb-18">
+    <div className="overflow-y-auto h-full w-full pb-18 text-[#424242]">
       <Menu opsi={menuOps}/>
 
       <div className="flex flex-col gap-8 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
