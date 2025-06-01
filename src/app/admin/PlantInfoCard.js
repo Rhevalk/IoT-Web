@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const hariOptions = [
   "Senin",
@@ -12,6 +13,9 @@ const hariOptions = [
   "Sabtu",
   "Minggu",
 ];
+
+const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15]; 
+
 
 export default function PlantInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
@@ -24,7 +28,7 @@ export default function PlantInfoCard() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [jadwal, setJadwal] = useState([]);
-  const [newHari, setNewHari] = useState("");
+  const [newHari, setNewHari] = useState("Senin");
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -271,7 +275,8 @@ export default function PlantInfoCard() {
 
                     <input
                       type="time"
-                      className="border rounded px-2 py-1 w-28"
+                      step="1"
+                      className="border rounded px-2 py-1 w-30"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -288,7 +293,8 @@ export default function PlantInfoCard() {
 
                     <input
                       type="time"
-                      className="border rounded px-2 py-1 w-28"
+                      step="1"
+                      className="border rounded px-2 py-1 w-30"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -305,15 +311,20 @@ export default function PlantInfoCard() {
                       type="number"
                       min={0}
                       max={40}
-                      className="border rounded px-2 py-1 w-28"
+                      className="border rounded px-2 py-1 w-30"
                       value={item.pin}
                       onChange={(e) => {
-                        const val = e.target.value;
-                        setJadwal((prev) => {
-                          const newJadwal = [...prev];
-                          newJadwal[idx].pin = val;
-                          return newJadwal;
-                        });
+                        const val = parseInt(e.target.value, 10);
+                      
+                        if (!protectedPins.includes(val)) {
+                          setJadwal((prev) => {
+                            const newJadwal = [...prev];
+                            newJadwal[idx].pin = val;
+                            return newJadwal;
+                          });
+                        } else {
+                          toast.error(`Pin ${val} diproteksi`);
+                        }
                       }}
                       placeholder="Pin"
                       title="Nomor Pin GPIO"
@@ -361,7 +372,8 @@ export default function PlantInfoCard() {
 
                   <input
                     type="time"
-                    className="border rounded px-2 py-1 w-28"
+                    step="1"
+                    className="border rounded px-2 py-1 w-30"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -372,7 +384,8 @@ export default function PlantInfoCard() {
 
                   <input
                     type="time"
-                    className="border rounded px-2 py-1 w-28"
+                    step="1"
+                    className="border rounded px-2 py-1 w-30"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
@@ -383,9 +396,25 @@ export default function PlantInfoCard() {
                     type="number"
                     min={0}
                     max={40}
-                    className="border rounded px-2 py-1 w-28"
+                    className="border rounded px-2 py-1 w-30"
                     value={newPin}
-                    onChange={(e) => setNewPin(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                    
+                      // Kalau input kosong, biarin supaya bisa dihapus
+                      if (val === "") {
+                        setNewPin("");
+                        return;
+                      }
+                    
+                      if (!protectedPins.includes(val)) {
+                        setNewPin(val);
+                      } else {
+                        toast.error(`Pin ${val} diproteksi`);
+                        // Kalau mau reset input ke kosong atau tetap nilai lama, bisa disesuaikan
+                        setNewPin("");
+                      }
+                    }}
                     placeholder="Pin"
                     title="Nomor Pin GPIO"
                   />

@@ -5,6 +5,7 @@ import Link from "next/link";
 function InfoCard({
   href,
   title,
+  icon,
   color,
   subtitle,
   infoTitle,
@@ -13,6 +14,7 @@ function InfoCard({
 }: {
   href: string;
   title: string;
+  icon: string;
   color: string;
   subtitle: string;
   infoTitle: string;
@@ -28,21 +30,10 @@ function InfoCard({
 
   return (
     <Link href={href}>
-      <div className="w-full bg-white hover:bg-[#f7f7f7] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-all duration-200 overflow-hidden">
+      <div className="w-full h-full bg-white border-1 border-[#e1e1e1] hover:bg-[#f7f7f7] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] transition-all duration-200 overflow-hidden">
         <div className={`${colorClass} bg-opacity-50 p-4`}>
           <div className="flex items-center mb-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-8 w-8 mr-3 stroke-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-            </svg>
+              <img src={icon} alt="" className="h-8 w-8 mr-2"/>
             <h1 className="text-white text-2xl font-semibold">{title}</h1>
           </div>
           <p className="text-white">{subtitle}</p>

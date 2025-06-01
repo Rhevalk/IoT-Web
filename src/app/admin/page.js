@@ -1,7 +1,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-//import LogoutButton from './LogoutButton';
+
 import Menu from "@/components/layout/menu"
 import PlantInfoCard from "./PlantInfoCard"
 import NilaInfoCard from "./NilaInfoCard"
@@ -13,8 +13,8 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
 ];
 
-export default function AdminPage() {
-  const cookieStore = cookies();
+export default async function AdminPage() {
+  const cookieStore = await cookies();
   const adminSession = cookieStore.get('admin_session');
 
   if (!adminSession) {

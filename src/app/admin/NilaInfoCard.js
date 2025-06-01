@@ -1,6 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const hariOptions = [
   "Senin",
@@ -11,6 +13,8 @@ const hariOptions = [
   "Sabtu",
   "Minggu",
 ];
+
+const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15]; 
 
 export default function NilaInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
@@ -137,16 +141,12 @@ export default function NilaInfoCard() {
 
       <div className="flex flex-col space-y-1.5 p-6">
         <div className="flex justify-between items-center">
-          <h3 className="tracking-tight text-2xl font-semibold flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2 text-green-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path d="M8 2v4M16 2v4M3 10h18M3 4a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2H5a2 2 0 01-2-2V4z" />
-            </svg>
+          <h3 className="tracking-tight text-2xl font-semibold flex items-center gap-2">
+            <img
+              src="/dashboard-icon/calender.svg"
+              alt=""
+              className="h-6 w-6"
+            />
             Info Ikan
           </h3>
           <div className="flex gap-2">
@@ -158,15 +158,11 @@ export default function NilaInfoCard() {
                 }}
                 className="h-10 w-10 text-green-600 hover:text-green-700"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mx-auto"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M12 20h9M16.38 3.62a1 1 0 013 3L7.37 18.63a2 2 0 01-.86.51l-2.87.84a.5.5 0 01-.62-.62l.84-2.87a2 2 0 01.51-.86z" />
-                </svg>
+                <img
+                  src="/dashboard-icon/pensil.svg"
+                  alt=""
+                  className="h-6 w-6"
+                />
               </button>
             ) : (
               <button
@@ -278,6 +274,7 @@ export default function NilaInfoCard() {
 
                     <input
                       type="time"
+                      step="1"
                       className="border rounded px-2 py-1 w-28"
                       value={item.start}
                       onChange={(e) => {
@@ -295,6 +292,7 @@ export default function NilaInfoCard() {
 
                     <input
                       type="time"
+                      step="1"
                       className="border rounded px-2 py-1 w-28"
                       value={item.end}
                       onChange={(e) => {
@@ -312,15 +310,20 @@ export default function NilaInfoCard() {
                       type="number"
                       min={0}
                       max={40}
-                      className="border rounded px-2 py-1 w-28"
+                      className="border rounded px-2 py-1 w-30"
                       value={item.pin}
                       onChange={(e) => {
-                        const val = e.target.value;
-                        setJadwal((prev) => {
-                          const newJadwal = [...prev];
-                          newJadwal[idx].pin = val;
-                          return newJadwal;
-                        });
+                        const val = parseInt(e.target.value, 10);
+                      
+                        if (!protectedPins.includes(val)) {
+                          setJadwal((prev) => {
+                            const newJadwal = [...prev];
+                            newJadwal[idx].pin = val;
+                            return newJadwal;
+                          });
+                        } else {
+                          toast.error(`Pin ${val} diproteksi`);
+                        }
                       }}
                       placeholder="Pin"
                       title="Nomor Pin GPIO"
@@ -368,6 +371,7 @@ export default function NilaInfoCard() {
 
                   <input
                     type="time"
+                    step="1"
                     className="border rounded px-2 py-1 w-28"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
@@ -379,6 +383,7 @@ export default function NilaInfoCard() {
 
                   <input
                     type="time"
+                    step="1"
                     className="border rounded px-2 py-1 w-28"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
@@ -390,12 +395,29 @@ export default function NilaInfoCard() {
                     type="number"
                     min={0}
                     max={40}
-                    className="border rounded px-2 py-1 w-28"
+                    className="border rounded px-2 py-1 w-30"
                     value={newPin}
-                    onChange={(e) => setNewPin(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                    
+                      // Kalau input kosong, biarin supaya bisa dihapus
+                      if (val === "") {
+                        setNewPin("");
+                        return;
+                      }
+                    
+                      if (!protectedPins.includes(val)) {
+                        setNewPin(val);
+                      } else {
+                        toast.error(`Pin ${val} diproteksi`);
+                        // Kalau mau reset input ke kosong atau tetap nilai lama, bisa disesuaikan
+                        setNewPin("");
+                      }
+                    }}
                     placeholder="Pin"
                     title="Nomor Pin GPIO"
                   />
+
 
                   <button
                     onClick={tambahJadwal}

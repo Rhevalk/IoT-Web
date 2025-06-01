@@ -87,6 +87,7 @@ export default function Home() {
           <InfoCard
             href="/dashboard/hidroponik"
             title="Hidroponik"
+            icon="/dashboard-icon/hidro.svg"
             color="green"
             subtitle="Monitoring kondisi tanaman hidroponik"
             infoTitle="Info Tanaman"
@@ -113,6 +114,7 @@ export default function Home() {
           <InfoCard
             href="/dashboard/timelapse"
             title="Timelapse"
+            icon="/dashboard-icon/cam.svg"
             color="gray"
             subtitle="Monitoring kondisi tanaman hidroponik"
             infoTitle="Info Timelapse"
@@ -128,6 +130,7 @@ export default function Home() {
           <InfoCard
             href="/dashboard/kolam-ikan-nila"
             title="Kolam Ikan"
+            icon="/dashboard-icon/ikan.svg"
             color="orange"
             subtitle="Monitoring kondisi ikan nila"
             infoTitle="Info & Jadwal Pakan"
@@ -157,6 +160,7 @@ export default function Home() {
           <InfoCard
             href="/dashboard/kolam-ikan-lele"
             title="Kolam Ikan Lele"
+            icon="/dashboard-icon/ikan.svg"
             color="blue"
             subtitle="Monitoring kondisi ikan lele"
             infoTitle="Info & Jadwal Pakan"

@@ -22,7 +22,7 @@ export default function Menu({ opsi = [] } : MenuProps) {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 bg-[#ffffff] h-16 w-screen flex justify-center gap-6 rounded-tl-4xl rounded-tr-4xl drop-shadow-[0_-4px_6px_rgba(0,0,0,0.1)]">
+    <div className="z-10 fixed bottom-0 bg-[#ffffff] h-16 w-screen flex justify-center gap-6 rounded-tl-4xl rounded-tr-4xl drop-shadow-[0_-4px_6px_rgba(0,0,0,0.1)]">
       {opsi.map((item, index) => (
         <div key={index} className={`flex h-full w-auto border-[#4f4f4f] ${pathname === item.href ? 'border-t-3' : 'border-none'}`}>
           <Link href={item.href} className="group h-full w-10 flex flex-col items-center justify-center">

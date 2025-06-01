@@ -4,6 +4,7 @@
 import InfoCard from "@/components/card/infoCard";
 import MediumCard from "@/components/card/mediumCard";
 import Menu from "@/components/layout/menu";
+import ChartCard from "@/components/card/ChartCard";
 import { useEffect, useState } from "react";
 
 const menuOps = [
@@ -79,7 +80,7 @@ export default function Log() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen text-[#424242]">
+    <div className="flex flex-col h-auto pb-32 text-[#424242]">
       <Menu opsi={menuOps}/>
 
       {/* Main Content */}
@@ -92,6 +93,7 @@ export default function Log() {
             href="/dashboard/kolam-ikan-lele"
             title="Kolam Ikan Lele"
             color="blue"
+            icon="/dashboard-icon/ikan.svg"
             subtitle="Monitoring kondisi ikan lele"
             infoTitle="Info & Jadwal Pakan"
             status={data?.status ? "Aktif" : "Non-Aktif"}
@@ -124,10 +126,10 @@ export default function Log() {
                 title="Suhu Air"
                 value={data?.suhu_air}
                 unit="°C"
-                //icon={DropletIcon}
+                icon="/mini-icon/suhu-air.svg"
                 thresholds={{
-                  low: 20, // masih blom tau
-                  high: 40, // masih blom tau
+                  low: 20, 
+                  high: 40, 
                 }}
                   lowColor="text-blue-500"
                   midColor="text-yellow-500"
@@ -141,10 +143,10 @@ export default function Log() {
                 title="Debit"
                 value={data?.debit}
                 unit="L/menit"
-                //icon={DropletIcon}
+                icon="/mini-icon/aliran-air.svg"
                 thresholds={{
-                  low: 0, // masih blom tau
-                  high: 100, // masih blom tau
+                  low: 0, 
+                  high: 1000, 
                 }}
                   lowColor="text-red-500"
                   midColor="text-green-500"
@@ -159,8 +161,9 @@ export default function Log() {
 
         {/* Extra Full Width Boxes */}
         <div className="mt-6 space-y-6">
-          <div className="w-full h-44 rounded-xl bg-amber-400 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#f9f8f8] transition-all duration-200"></div>
-          <div className="w-full h-44 rounded-xl bg-amber-400 shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#f9f8f8] transition-all duration-200"></div>
+          <div className="w-full h-auto rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-200">
+            <ChartCard label="Grafik TDS" color="#2563eb"  />{/* data={myChartData} */}
+          </div>
         </div>
       </main>
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import {
   LineChart,
@@ -7,6 +8,7 @@ import {
 
 interface SmallCardProps {
   title: string;
+  icon: string;
   value?: number | string | null;
   unit?: string;
   lowColor?: string;
@@ -20,6 +22,7 @@ interface SmallCardProps {
 }
 
 const SmallCard: React.FC<SmallCardProps> = ({
+  icon,
   title,
   value,
   unit = "",
@@ -37,9 +40,12 @@ const SmallCard: React.FC<SmallCardProps> = ({
   };
 
   return (
-    <div className="p-4 h-full w-1/2 rounded-xl bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#f9f8f8] transition-all duration-200 flex flex-col justify-between">
+    <div className="p-4 h-full w-1/2 rounded-xl border-1 border-[#e1e1e1] bg-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:bg-[#f9f8f8] transition-all duration-200 flex flex-col justify-between">
       <div>
-        <h1 className="font-semibold">{title}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-semibold">{title}</h1>
+          <img src={icon} alt="" className="h-6 w-6"/>
+        </div>
         <div className="flex mt-6 gap-1 items-end">
           <h1 className={`text-4xl font-semibold ${getValueColor()}`}>
             {value ?? "--"}
