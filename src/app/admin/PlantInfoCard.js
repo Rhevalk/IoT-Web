@@ -77,8 +77,10 @@ export default function PlantInfoCard() {
   };
 
   const data = {
-    plantInfo : plantInfo,
-    jadwal : jadwal
+      plantInfo : {
+        ...plantInfo,
+      jadwal : jadwal
+    }
   }
 
   // menyimpan hasil edit dan menyimpan data
@@ -108,7 +110,7 @@ export default function PlantInfoCard() {
         if (res.ok) {
           const data = await res.json();
           setPlantInfo(data["plantInfo"]);
-          setJadwal(data["jadwal"]);
+          setJadwal(data["plantInfo"]["jadwal"]);
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -276,7 +278,7 @@ export default function PlantInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -294,7 +296,7 @@ export default function PlantInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -311,7 +313,7 @@ export default function PlantInfoCard() {
                       type="number"
                       min={0}
                       max={40}
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
@@ -373,7 +375,7 @@ export default function PlantInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -385,7 +387,7 @@ export default function PlantInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
@@ -396,7 +398,7 @@ export default function PlantInfoCard() {
                     type="number"
                     min={0}
                     max={40}
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newPin}
                     onChange={(e) => {
                       const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);

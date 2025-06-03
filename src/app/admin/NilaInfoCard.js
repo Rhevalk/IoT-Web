@@ -18,7 +18,7 @@ const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15];
 
 export default function NilaInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
-  const [nilaInfo, setNilaInfo] = useState({
+  const [NilaInfo, setNilaInfo] = useState({
     type: '--',
     ikanHidup: '--:--',
     ikanMati: '--:--',
@@ -27,7 +27,7 @@ export default function NilaInfoCard() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [jadwal, setJadwal] = useState([]);
-  const [newHari, setNewHari] = useState("");
+  const [newHari, setNewHari] = useState("Senin");
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -76,8 +76,11 @@ export default function NilaInfoCard() {
   };
 
   const data = {
-    nilaInfo : nilaInfo,
-    jadwal : jadwal
+    NilaInfo : {
+      ...NilaInfo,
+      jadwal : jadwal
+    }
+
   }
 
   // menyimpan hasil edit dan menyimpan data
@@ -103,11 +106,11 @@ export default function NilaInfoCard() {
   useEffect(() => {
     async function fetchJadwal() {
       try {
-        const res = await fetch('/api/data-get?file=kolam-ikan-nila');
+        const res = await fetch('/api/data-get?file=kolam-ikan');
         if (res.ok) {
           const data = await res.json();
-          setNilaInfo(data["nilaInfo"]);
-          setJadwal(data["jadwal"]);
+          setNilaInfo(data["NilaInfo"]);
+          setJadwal(data["NilaInfo"]["jadwal"]);
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -184,12 +187,12 @@ export default function NilaInfoCard() {
             <input
               type="text"
               name="type"
-              value={nilaInfo.type}
+              value={NilaInfo.type}
               onChange={handleChange}
               className="border rounded px-2 py-1 w-full"
             />
           ) : (
-            <p>{nilaInfo.type}</p>
+            <p>{NilaInfo.type}</p>
           )}
         </div>
 
@@ -200,12 +203,12 @@ export default function NilaInfoCard() {
             <input
               type="text"
               name="ikanHidup"
-              value={nilaInfo.ikanHidup}
+              value={NilaInfo.ikanHidup}
               onChange={handleChange}
               className="border rounded px-2 py-1 w-full"
             />
           ) : (
-            <p>{nilaInfo.ikanHidup}</p>
+            <p>{NilaInfo.ikanHidup}</p>
           )}
         </div>
 
@@ -216,12 +219,12 @@ export default function NilaInfoCard() {
             <input
               type="text"
               name="ikanMati"
-              value={nilaInfo.ikanMati}
+              value={NilaInfo.ikanMati}
               onChange={handleChange}
               className="border rounded px-2 py-1 w-full"
             />
           ) : (
-            <p>{nilaInfo.ikanMati}</p>
+            <p>{NilaInfo.ikanMati}</p>
           )}
         </div>
 
@@ -275,7 +278,7 @@ export default function NilaInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-28"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -293,7 +296,7 @@ export default function NilaInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-28"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -372,7 +375,7 @@ export default function NilaInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-28"
+                    className="border rounded px-2 py-1 w-34"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -384,7 +387,7 @@ export default function NilaInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-28"
+                    className="border rounded px-2 py-1 w-34"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"

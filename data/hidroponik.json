@@ -1,0 +1,15 @@
+{
+  "plantInfo": {
+    "type": "Cabe",
+    "plantingDate": "12 maret 1721",
+    "harvestDate": "15 Juni 2025",
+    "jadwal": [
+      {
+        "hari": "Selasa",
+        "start": "00:00:00",
+        "end": "01:33:00",
+        "pin": 14
+      }
+    ]
+  }
+}

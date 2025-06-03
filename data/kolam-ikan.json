@@ -1,0 +1,40 @@
+{
+  "NilaInfo": {
+    "type": "Nila",
+    "ikanHidup": "100",
+    "ikanMati": "0",
+    "jadwal": [
+      {
+        "hari": "Senin",
+        "start": "12:34:06",
+        "end": "12:39:01",
+        "pin": 1
+      },
+      {
+        "hari": "Sabtu",
+        "start": "12:01:14",
+        "end": "12:01:15",
+        "pin": 14
+      }
+    ]
+  },
+  "LeleInfo": {
+    "type": "Lele",
+    "ikanHidup": "150",
+    "ikanMati": "12",
+    "jadwal": [
+      {
+        "hari": "Jumat",
+        "start": "12:56:42",
+        "end": "12:01:43",
+        "pin": 1
+      },
+      {
+        "hari": "Rabu",
+        "start": "12:56:49",
+        "end": "16:56:49",
+        "pin": 5
+      }
+    ]
+  }
+}

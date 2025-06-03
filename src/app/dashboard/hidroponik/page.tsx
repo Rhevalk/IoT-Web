@@ -36,9 +36,9 @@ export default function Log() {
   const [data, setData] = useState<MyDataType | null>(null);
   useEffect(() => {
     const fetchData = () => {
-      fetch("/api/hidroponik")
+      fetch("/api/data-post?file=hidroponik")
         .then((res) => res.json())
-        .then((json) => setData(json))
+        .then((json) => setData(json['HidroponikInfo']))
         .catch((err) => console.error("Gagal ambil data:", err));
     };
 
@@ -56,7 +56,6 @@ export default function Log() {
         const res = await fetch('/api/data-get?file=hidroponik');
         if (res.ok) {
           const getJson = await res.json();
-          console.log(getJson["plantInfo"]);
           setDataJson(getJson["plantInfo"]);
         } else {
           console.error('Gagal fetch data jadwal');

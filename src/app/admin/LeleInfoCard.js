@@ -27,7 +27,7 @@ export default function LeleInfoCard() {
   const [isEditMode, setIsEditMode] = useState(false);
 
   const [jadwal, setJadwal] = useState([]);
-  const [newHari, setNewHari] = useState("");
+  const [newHari, setNewHari] = useState("Senin");
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [newPin, setNewPin] = useState("");
@@ -76,8 +76,10 @@ export default function LeleInfoCard() {
   };
 
   const data = {
-    LeleInfo : LeleInfo,
-    jadwal : jadwal
+    LeleInfo : {
+      ...LeleInfo,
+      jadwal : jadwal
+    }
   }
 
   // menyimpan hasil edit dan menyimpan data
@@ -103,11 +105,11 @@ export default function LeleInfoCard() {
   useEffect(() => {
     async function fetchJadwal() {
       try {
-        const res = await fetch('/api/data-get?file=kolam-ikan-lele');
+        const res = await fetch('/api/data-get?file=kolam-ikan');
         if (res.ok) {
           const data = await res.json();
           setLeleInfo(data["LeleInfo"]);
-          setJadwal(data["jadwal"]);
+          setJadwal(data["LeleInfo"]["jadwal"]);
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -276,7 +278,7 @@ export default function LeleInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -294,7 +296,7 @@ export default function LeleInfoCard() {
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -311,7 +313,7 @@ export default function LeleInfoCard() {
                       type="number"
                       min={0}
                       max={40}
-                      className="border rounded px-2 py-1 w-30"
+                      className="border rounded px-2 py-1 w-34"
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
@@ -373,7 +375,7 @@ export default function LeleInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -385,7 +387,7 @@ export default function LeleInfoCard() {
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
@@ -396,7 +398,7 @@ export default function LeleInfoCard() {
                     type="number"
                     min={0}
                     max={40}
-                    className="border rounded px-2 py-1 w-30"
+                    className="border rounded px-2 py-1 w-34"
                     value={newPin}
                     onChange={(e) => {
                       const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);

@@ -12,7 +12,6 @@
 .next
 .env
 .DS_Store
-data/*.json
 
 # testing
 /coverage

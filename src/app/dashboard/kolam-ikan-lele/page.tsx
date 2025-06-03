@@ -36,9 +36,9 @@ export default function Log() {
 
   useEffect(() => {
     const fetchData = () => {
-      fetch("/api/kolam-ikan-lele")
+      fetch("/api/data-post?file=kolam-ikan")
         .then((res) => res.json())
-        .then((json) => setData(json))
+        .then((json) => setData(json['LeleInfo']))
         .catch((err) => console.error("Gagal ambil data:", err));
     };
 
@@ -64,11 +64,10 @@ export default function Log() {
   useEffect(() => {
     async function fetchJadwal() {
       try {
-        const res = await fetch('/api/data-get?file=kolam-ikan-lele');
+        const res = await fetch('/api/data-get?file=kolam-ikan');
         if (res.ok) {
           const getJson = await res.json();
-          console.log(getJson["jadwal"]);
-          setDataJson(getJson["jadwal"]);
+          setDataJson(getJson["LeleInfo"]["jadwal"]);
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -106,7 +105,7 @@ export default function Log() {
                     {dataJson.length > 0 ? (
                       dataJson.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
                         </li>
                       ))
                     ) : (

@@ -10,15 +10,22 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
 ];
 
-interface MyDataJsonType {
+type MyDataJsonType = {
+  // definisi tipe objek json kamu
   type: string;
   plantingDate: string;
   harvestDate: string;
-  hari : string
-  start : string
-  end : string
-  pin : string
-}
+  ikanHidup: string;
+  ikanMati: string;
+  jadwal: JadwalItem[];
+};
+
+type JadwalItem = {
+  hari: string;
+  start: string;
+  end: string;
+  pin: number;
+};
 
 export default function Home() {
 
@@ -26,55 +33,79 @@ export default function Home() {
   const [data_H, setData_H] = useState<{status: boolean} | null>(null);
   const [data_N, setData_N] = useState<{status: boolean} | null>(null);
   const [data_L, setData_L] = useState<{status: boolean} | null>(null);
+
   useEffect(() => {
     const endpoints = [
-      { url: "/api/hidroponik", setter: setData_H, label: "data_H" },
-      { url: "/api/kolam-ikan-nila", setter: setData_N, label: "data_N" },
-      { url: "/api/kolam-ikan-lele", setter: setData_L, label: "data_L" },
+      { url: "/api/data-post?file=hidroponik", key: "HidroponikInfo", setter: setData_H, label: "data_H" },
+      { url: "/api/data-post?file=kolam-ikan", key: "NilaInfo", setter: setData_N, label: "data_N" },
+      { url: "/api/data-post?file=kolam-ikan", key: "LeleInfo", setter: setData_L, label: "data_L" },
     ];
-  
-    const intervals = endpoints.map(({ url, setter, label }) => {
+
+    const intervals = endpoints.map(({ url, key, setter, label }) => {
       const fetchData = () => {
-        fetch(url)
-          .then((res) => res.json())
-          .then(setter)
-          .catch((err) => console.error(`Gagal ambil ${label}:`, err));
+      fetch(url)
+        .then(res => {
+          if (!res.ok) {
+            console.warn(`Gagal fetch dari ${url}: status ${res.status}`);
+            return null;
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data) setter(data[key]);
+          else setter(null);
+        })
+        .catch(err => {
+          console.error(`Gagal ambil ${label}:`, err.message || err);
+          setter(null);
+        });
+      
+      
       };
-    
+
       fetchData();
       return setInterval(fetchData, 10000);
     });
-  
+
     return () => intervals.forEach(clearInterval);
   }, []);
 
+
   /*===============================MENGAMBIL JADWAL================================================*/
   const [dataJson_H, setDataJson_H] = useState<MyDataJsonType | null>(null);
-  const [dataJson_H_list, setDataJson_H_list] = useState<MyDataJsonType[]>([]);
-  const [dataJson_N, setDataJson_N] = useState<MyDataJsonType[]>([]);
-  const [dataJson_L, setDataJson_L] = useState<MyDataJsonType[]>([]);
-  useEffect(() => {
-    const fetchList = [
-      { file: 'hidroponik', key: 'plantInfo', setter: setDataJson_H },
-      { file: 'hidroponik', key: 'jadwal', setter: setDataJson_H_list },
-      { file: 'kolam-ikan-nila', key: 'jadwal', setter: setDataJson_N },
-      { file: 'kolam-ikan-lele', key: 'jadwal', setter: setDataJson_L },
-    ];
+  const [dataJson_H_list, setDataJson_H_list] = useState<JadwalItem[]>([]);
 
-    fetchList.forEach(async ({ file, key, setter }) => {
+  const [dataJson_N, setDataJson_N] = useState<MyDataJsonType | null>(null);
+  const [dataJson_N_list, setDataJson_N_list] = useState<JadwalItem[]>([]);
+
+  const [dataJson_L, setDataJson_L] = useState<MyDataJsonType | null>(null);
+  const [dataJson_L_list, setDataJson_L_list] = useState<JadwalItem[]>([]);
+
+  useEffect(() => {
+    const fetchAndSetJadwal = async (
+      file: string,
+      key: string,
+      setInfo: (data: MyDataJsonType) => void,
+      setList: (data: JadwalItem[]) => void
+    ) => {
       try {
         const res = await fetch(`/api/data-get?file=${file}`);
         if (res.ok) {
-          const json = await res.json();
-          console.log(json[key]);
-          setter(json[key]);
+          const data = await res.json();
+          const info = data[key];
+          setInfo(info);
+          setList(info.jadwal || data.jadwal); // fallback kalau struktur beda
         } else {
-          console.error(`Gagal fetch data dari ${file}`);
+          console.error(`Gagal fetch data jadwal dari ${file}`);
         }
-      } catch (err) {
-        console.error(`Error saat fetch ${file}:`, err);
+      } catch (error) {
+        console.error(`Error saat fetch jadwal dari ${file}:`, error);
       }
-    });
+    };
+
+    fetchAndSetJadwal('hidroponik', 'plantInfo', setDataJson_H, setDataJson_H_list);
+    fetchAndSetJadwal('kolam-ikan', 'NilaInfo', setDataJson_N, setDataJson_N_list);
+    fetchAndSetJadwal('kolam-ikan', 'LeleInfo', setDataJson_L, setDataJson_L_list);
   }, []);
 
   return (
@@ -100,11 +131,15 @@ export default function Home() {
                 label: "Jadwal Pencahayaan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {dataJson_H_list.map((item, i) => (
-                      <li key={i}>
-                        {item.hari}: {item.start} - {item.end} (Pin {item.pin})
-                      </li>
-                    ))}
+                    {dataJson_H_list.length > 0 ? (
+                      dataJson_H_list.map((item, i) => (
+                        <li key={i}>
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak ada jadwal</li>
+                    )}
                   </ul>
                 ),
               }
@@ -129,22 +164,24 @@ export default function Home() {
           {/* InfoCard: Kolam Ikan Nila */}
           <InfoCard
             href="/dashboard/kolam-ikan-nila"
-            title="Kolam Ikan"
+            title="Kolam Ikan Nila"
             icon="/dashboard-icon/ikan.svg"
             color="orange"
             subtitle="Monitoring kondisi ikan nila"
             infoTitle="Info & Jadwal Pakan"
             status={data_N?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Ikan", value: "Nila" },
+              { label: "Jenis Ikan", value: dataJson_N?.type ?? "--:--" },
+              { label: "Ikan Hidup", value: dataJson_N?.ikanHidup ?? "--:--" },
+              { label: "Ikan Mati", value: dataJson_N?.ikanMati ?? "--:--" },
               {
-                label: "Jadwal Pencahayaan",
+                label: "Jadwal Pakan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {dataJson_N.length > 0 ? (
-                      dataJson_N.map((item, i) => (
+                    {dataJson_N_list.length > 0 ? (
+                      dataJson_N_list.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
                         </li>
                       ))
                     ) : (
@@ -166,15 +203,17 @@ export default function Home() {
             infoTitle="Info & Jadwal Pakan"
             status={data_L?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
-              { label: "Jenis Ikan", value: "Lele" },
+              { label: "Jenis Ikan", value: dataJson_L?.type ?? "--:--" },
+              { label: "Ikan Hidup", value: dataJson_L?.ikanHidup ?? "--:--" },
+              { label: "Ikan Mati", value: dataJson_L?.ikanMati ?? "--:--" },
               {
                 label: "Jadwal Pakan",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
-                    {dataJson_L.length > 0 ? (
-                      dataJson_L.map((item, i) => (
+                    {dataJson_L_list.length > 0 ? (
+                      dataJson_L_list.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin}) (Otomatis)
+                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
                         </li>
                       ))
                     ) : (
