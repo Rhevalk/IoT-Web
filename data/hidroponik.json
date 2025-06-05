@@ -2,13 +2,14 @@
   "plantInfo": {
     "type": "Cabe",
     "plantingDate": "12 maret 1721",
-    "harvestDate": "15 Juni 2025",
+    "harvestDate": "34 April 1231",
     "jadwal": [
       {
-        "hari": "Selasa",
-        "start": "00:00:00",
-        "end": "01:33:00",
-        "pin": 14
+        "hari": "Senin",
+        "start": "23:29:39",
+        "end": "23:30:40",
+        "pin": 1,
+        "deskripsi": "Pencahayaan"
       }
     ]
   }

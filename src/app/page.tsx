@@ -5,9 +5,9 @@ import Menu from "@/components/layout/menu"
 import { useEffect, useState } from "react";
 
 const menuOps = [
-  { name: "Data", href: "/data", icon: "/nav-icon/log-f.svg" },
-  { name: "Home", href: "/", icon: "/nav-icon/home-f.svg" },
-  { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
+  { name: "Data", href: "/data", icon_f: "/nav-icon/log-f.svg", color: "bg-blue-400"     , icon_s: "/nav-icon/log-s.svg"},
+  { name: "Home", href: "/", icon_f: "/nav-icon/home-f.svg", color: "bg-orange-400"      , icon_s: "/nav-icon/home-s.svg"},
+  { name: "Admin", href: "/admin", icon_f: "/nav-icon/admin-f.svg", color: "bg-green-400", icon_s: "/nav-icon/admin-s.svg"},
 ];
 
 type MyDataJsonType = {
@@ -25,6 +25,7 @@ type JadwalItem = {
   start: string;
   end: string;
   pin: number;
+  deskripsi: number;
 };
 
 export default function Home() {
@@ -34,7 +35,7 @@ export default function Home() {
   const [data_N, setData_N] = useState<{status: boolean} | null>(null);
   const [data_L, setData_L] = useState<{status: boolean} | null>(null);
 
-  useEffect(() => {
+ useEffect(() => {
     const endpoints = [
       { url: "/api/data-post?file=hidroponik", key: "HidroponikInfo", setter: setData_H, label: "data_H" },
       { url: "/api/data-post?file=kolam-ikan", key: "NilaInfo", setter: setData_N, label: "data_N" },
@@ -71,6 +72,7 @@ export default function Home() {
   }, []);
 
 
+
   /*===============================MENGAMBIL JADWAL================================================*/
   const [dataJson_H, setDataJson_H] = useState<MyDataJsonType | null>(null);
   const [dataJson_H_list, setDataJson_H_list] = useState<JadwalItem[]>([]);
@@ -93,8 +95,12 @@ export default function Home() {
         if (res.ok) {
           const data = await res.json();
           const info = data[key];
-          setInfo(info);
-          setList(info.jadwal || data.jadwal); // fallback kalau struktur beda
+          if (data[key]) {
+            setInfo(info);
+            setList(info.jadwal || data.jadwal); // fallback kalau struktur beda
+          } else {
+            console.error(`Json kosong dari ${file}`);
+          }
         } else {
           console.error(`Gagal fetch data jadwal dari ${file}`);
         }
@@ -109,7 +115,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="overflow-y-auto h-full w-full pb-18 text-[#424242]">
+    <div className="overflow-y-auto h-full w-full pb-18 text-[#424242">
       <Menu opsi={menuOps}/>
 
       <div className="flex flex-col gap-8 px-4 py-6 md:px-8 max-w-screen-xl mx-auto">
@@ -128,13 +134,13 @@ export default function Home() {
               { label: "Jadwal Tanam", value: dataJson_H?.harvestDate ?? "--:--" },
               { label: "Perkiraan Panen", value: dataJson_H?.plantingDate ?? "--:--" },
               {
-                label: "Jadwal Pencahayaan",
+                label: "Jadwal",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
                     {dataJson_H_list.length > 0 ? (
                       dataJson_H_list.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                         </li>
                       ))
                     ) : (
@@ -168,20 +174,20 @@ export default function Home() {
             icon="/dashboard-icon/ikan.svg"
             color="orange"
             subtitle="Monitoring kondisi ikan nila"
-            infoTitle="Info & Jadwal Pakan"
+            infoTitle="Info & Jadwal"
             status={data_N?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
               { label: "Jenis Ikan", value: dataJson_N?.type ?? "--:--" },
               { label: "Ikan Hidup", value: dataJson_N?.ikanHidup ?? "--:--" },
               { label: "Ikan Mati", value: dataJson_N?.ikanMati ?? "--:--" },
               {
-                label: "Jadwal Pakan",
+                label: "Jadwal",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
                     {dataJson_N_list.length > 0 ? (
                       dataJson_N_list.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                         </li>
                       ))
                     ) : (
@@ -200,20 +206,20 @@ export default function Home() {
             icon="/dashboard-icon/ikan.svg"
             color="blue"
             subtitle="Monitoring kondisi ikan lele"
-            infoTitle="Info & Jadwal Pakan"
+            infoTitle="Info & Jadwal"
             status={data_L?.status ? "Aktif" : "Non-Aktif"}
             detailItems={[
               { label: "Jenis Ikan", value: dataJson_L?.type ?? "--:--" },
               { label: "Ikan Hidup", value: dataJson_L?.ikanHidup ?? "--:--" },
               { label: "Ikan Mati", value: dataJson_L?.ikanMati ?? "--:--" },
               {
-                label: "Jadwal Pakan",
+                label: "Jadwal",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
                     {dataJson_L_list.length > 0 ? (
                       dataJson_L_list.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                          <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                         </li>
                       ))
                     ) : (

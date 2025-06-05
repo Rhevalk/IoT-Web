@@ -45,19 +45,16 @@ export async function PUT(req) {
     // Gabungkan data dengan benar
     let newData = { ...existingData };
 
-    if (body.plantInfo) {
-      newData.plantInfo = {
-        ...existingData.plantInfo,
-        ...body.plantInfo,
+    // Cari key utama secara dinamis (yang berakhiran "Info")
+    const infoKey = Object.keys(body).find((key) => key.endsWith("Info"));
+
+    if (infoKey && typeof body[infoKey] === "object") {
+      newData[infoKey] = {
+        ...(existingData[infoKey] || {}),
+        ...body[infoKey],
       };
     }
 
-    if (body.jadwal) {
-      newData.plantInfo = {
-        ...(newData.plantInfo || {}),
-        jadwal: body.jadwal,
-      };
-    }
 
     fs.writeFileSync(filePath, JSON.stringify(newData, null, 2));
 

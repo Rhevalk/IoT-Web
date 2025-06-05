@@ -38,3 +38,25 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 =======
 # IoT-Web
 >>>>>>> 772bc173aa4aac0c09e8fcb7cd883c887eec2ada
+
+
+- *Dashboard terpisah
+- *Sistem jadwal multi ganda (jam, menit, detik) 
+- *Grafik data
+- *Tampilkan status semua alat (online/offline, baterai, sinyal).
+- *Notifikasi peringatan
+- *Menandai data penting (misalnya: suhu ekstrem, pH turun drastis).
+
+- Sistem kontrol manual
+- Log data
+- TImelapse
+- Notifikasi Cerdas (Smart Alert)
+- Bisa pilih rentang waktu dan format: CSV, Excel, PDF.
+- Data log disimpan otomatis ke cloud.
+- Perbandingan Data (Compare Mode)
+- Bandingkan data dua waktu berbeda (misalnya minggu ini vs minggu lalu).
+- Cocok untuk melihat efek dari pergantian nutrisi atau cuaca.
+- Download Data
+- Halaman "Laporan"
+- Ringkasan mingguan/bulanan.
+- Grafik, tabel, insight, dan tombol ekspor.

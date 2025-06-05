@@ -8,16 +8,18 @@ import ChartCard from "@/components/card/ChartCard";
 import { useEffect, useState } from "react";
 
 const menuOps = [
-  { name: "Data", href: "/data", icon: "/nav-icon/log-f.svg" },
-  { name: "Home", href: "/", icon: "/nav-icon/home-f.svg" },
-  { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
+  { name: "Data", href: "/data", icon_f: "/nav-icon/log-f.svg", color: "bg-blue-400"     , icon_s: "/nav-icon/log-s.svg"},
+  { name: "Home", href: "/", icon_f: "/nav-icon/home-f.svg", color: "bg-orange-400"      , icon_s: "/nav-icon/home-s.svg"},
+  { name: "Admin", href: "/admin", icon_f: "/nav-icon/admin-f.svg", color: "bg-green-400", icon_s: "/nav-icon/admin-s.svg"},
 ];
+
 
 interface MyDataJsonType {
   hari : string
   start : string
   end : string
   pin : string
+  deskripsi : string
 }
 
 type ChartValue = { value: number };
@@ -28,6 +30,19 @@ interface MyDataType {
   debit: number;
 }
 
+type DataPoint = { name: string; value: number };
+type ChartData = Record<"1d" | "1w" | "1m" | "6m", DataPoint[]>;
+
+interface ApiDataItem {
+  tipe: string;
+  createdAt: string;
+  value?: number;
+  suhu_air?: number;
+  tds?: number;
+  // field lain sesuai API
+}
+
+
 export default function Log() {
   
   /*===============================CEK STATUS CLIENT================================================*/
@@ -36,7 +51,7 @@ export default function Log() {
     const fetchData = () => {
       fetch("/api/data-post?file=kolam-ikan")
         .then((res) => res.json())
-        .then((json) => setData(json['NilaInfo']))
+        .then((json) => setData(json["NilaInfo"]))
         .catch((err) => console.error("Gagal ambil data:", err));
     };
 
@@ -80,8 +95,43 @@ export default function Log() {
     fetchJadwal();
   }, []);
 
+    /*===============================MENGAMBIL DATA CHART================================================*/
+  const [chartData, setChartData] = useState<ChartData>({
+    "1d": [],
+    "1w": [],
+    "1m": [],
+    "6m": [],
+  });
+
+const fetchData = async (range: keyof ChartData) => {
+  const file = "kolam_ikan";
+  try {
+    const res = await fetch(`/api/data-sql?file=${file}&range=${range}`);
+    if (!res.ok) throw new Error("Failed to fetch data");
+    const data: ApiDataItem[] = await res.json();
+
+    if (!Array.isArray(data)) {
+      console.error("API data is not an array");
+      setChartData(prev => ({ ...prev, [range]: [] }));
+      return;
+    }
+
+    // Filter hanya data tipe LeleInfo, atau ganti sesuai kebutuhan kamu
+    const filtered = data.filter(item => item.tipe === "NilaInfo");
+
+    const processedData: DataPoint[] = filtered.map(item => ({
+      name: new Date(item.createdAt).toLocaleString(),
+      value: item.suhu_air ?? 0,
+    }));
+
+    setChartData(prev => ({ ...prev, [range]: processedData }));
+  } catch (error) {
+    console.error("Error fetching chart data:", error);
+  }
+};
+
   return (
-    <div className="flex flex-col h-auto pb-32 text-[#424242]">
+    <div className="flex flex-col h-auto pb-32 text-[#424242] ">
       <Menu opsi={menuOps}/>
 
       {/* Main Content */}
@@ -101,13 +151,13 @@ export default function Log() {
             detailItems={[
               { label: "Jenis Ikan", value: "Nila" },
               {
-                label: "Jadwal Pakan",
+                label: "Jadwal",
                 value: (
                   <ul className="list-disc pl-4 space-y-1">
                     {dataJson.length > 0 ? (
                       dataJson.map((item, i) => (
                         <li key={i}>
-                          {item.hari}: {item.start} - {item.end} (Pin {item.pin})
+                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                         </li>
                       ))
                     ) : (
@@ -136,7 +186,12 @@ export default function Log() {
                   midColor="text-yellow-500"
                   highColor="text-red-500"
 
+                  lowHEX = "#3b82f6"   
+                  midHEX = "#eab308" 
+                  highHEX = "#ef4444"
+
                   chartData={chartSuhuAir}
+
               />
 
             {/*===============================DEBIT=================================== */}
@@ -147,13 +202,18 @@ export default function Log() {
                 icon="/mini-icon/aliran-air.svg"
                 thresholds={{
                   low: 0, 
-                  high: 1000, 
+                  high: 12, 
                 }}
                   lowColor="text-red-500"
                   midColor="text-green-500"
                   highColor="text-blue-500"
 
+                  lowHEX="#ef4444"
+                  midHEX="#22c55e"
+                  highHEX="#3b82f6"
+
                   chartData={chartDebit}
+
               />
     
           </div>
@@ -163,7 +223,11 @@ export default function Log() {
         {/* Extra Full Width Boxes */}
         <div className="mt-6 space-y-6">
           <div className="w-full h-auto rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-200">
-            <ChartCard label="Grafik TDS" color="#2563eb"  />{/* data={myChartData} */}
+            <ChartCard
+              label="Data Suhu Air"
+              data={chartData}
+              onRangeChange={fetchData}
+            />
           </div>
         </div>
       </main>

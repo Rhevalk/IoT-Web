@@ -8,10 +8,11 @@ import NilaInfoCard from "./NilaInfoCard"
 import LeleInfoCard from "./LeleInfoCard"
 
 const menuOps = [
-  { name: "Data", href: "/data", icon: "/nav-icon/log-f.svg" },
-  { name: "Home", href: "/", icon: "/nav-icon/home-f.svg" },
-  { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
+  { name: "Data", href: "/data", icon_f: "/nav-icon/log-f.svg", color: "bg-blue-400"     , icon_s: "/nav-icon/log-s.svg"},
+  { name: "Home", href: "/", icon_f: "/nav-icon/home-f.svg", color: "bg-orange-400"      , icon_s: "/nav-icon/home-s.svg"},
+  { name: "Admin", href: "/admin", icon_f: "/nav-icon/admin-f.svg", color: "bg-green-400", icon_s: "/nav-icon/admin-s.svg"},
 ];
+
 
 export default async function AdminPage() {
   const cookieStore = await cookies();

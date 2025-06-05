@@ -31,6 +31,7 @@ export default function LeleInfoCard() {
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [newDeskripsi, setNewDeskripsi] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +58,13 @@ export default function LeleInfoCard() {
       !isDuplicate(newHari, newStartTime, newEndTime, newPin)
     ) {
       setJadwal((prev) =>
-        [...prev, { hari: newHari, start: newStartTime, end: newEndTime, pin: newPin }].sort((a, b) => {
+        [...prev, {
+          hari: newHari,
+          start: newStartTime,
+          end: newEndTime,
+          pin: newPin,
+          deskripsi: newDeskripsi || "" // optional
+        }].sort((a, b) => {
           const hariA = hariOptions.indexOf(a.hari);
           const hariB = hariOptions.indexOf(b.hari);
           if (hariA !== hariB) return hariA - hariB;
@@ -68,6 +75,7 @@ export default function LeleInfoCard() {
       setNewEndTime("");
       setNewHari("");
       setNewPin("");
+      setNewDeskripsi("");
     }
   };
 
@@ -91,7 +99,7 @@ export default function LeleInfoCard() {
   };
   // fungsi simpan jadwal
   async function sendToJson() {
-    const res = await fetch('/api/data-put?file=kolam-ikan-lele', {
+    const res = await fetch('/api/data-put?file=kolam-ikan', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -108,8 +116,10 @@ export default function LeleInfoCard() {
         const res = await fetch('/api/data-get?file=kolam-ikan');
         if (res.ok) {
           const data = await res.json();
-          setLeleInfo(data["LeleInfo"]);
-          setJadwal(data["LeleInfo"]["jadwal"]);
+          if (data["LeleInfo"]) {
+            setLeleInfo(data["LeleInfo"]);
+            setJadwal(data["LeleInfo"]["jadwal"]);
+          }
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -138,7 +148,7 @@ export default function LeleInfoCard() {
           </svg>
           <h1 className="text-white text-2xl font-semibold">Kolam Ikan Lele</h1>
         </div>
-        <p className="text-white">Atur jadwal pakan dan catat perkembangan ikan</p>
+        <p className="text-white">Atur jadwal dan catat perkembangan ikan</p>
       </div>
 
       <div className="flex flex-col space-y-1.5 p-6">
@@ -232,7 +242,7 @@ export default function LeleInfoCard() {
           {!isEditMode && (
             <div>
               <label className="text-xl leading-none font-semibold">
-                Jadwal Pakan:
+                Jadwal:
               </label>
               <ul className="list-disc list-inside ml-4 mt-1 text-base">
                 {jadwal.length === 0 ? (
@@ -240,7 +250,7 @@ export default function LeleInfoCard() {
                 ) : (
                   jadwal.map((item, idx) => (
                     <li key={idx}>
-                      <strong>{item.hari}:</strong> {item.start} -- {item.end} (Pin: {item.pin}) 
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                     </li>
                   ))
                 )}
@@ -256,6 +266,21 @@ export default function LeleInfoCard() {
               <div className="space-y-2 mt-1">
                 {jadwal.map((item, idx) => (
                   <div key={idx} className="flex md:items-center space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+
+                      <input
+                      type="text"
+                      className="border rounded px-2 py-1 w-48"
+                      value={item.deskripsi || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].deskripsi = val;
+                          return newJadwal;
+                        });
+                      }}
+                      placeholder="Deskripsi jadwal"
+                    />
                     <select
                       className="border rounded px-2 py-1"
                       value={item.hari}
@@ -309,6 +334,7 @@ export default function LeleInfoCard() {
                       title="Jam Selesai"
                     />
 
+
                     <input
                       type="number"
                       min={0}
@@ -317,16 +343,23 @@ export default function LeleInfoCard() {
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
-                      
-                        if (!protectedPins.includes(val)) {
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].pin = val;
+                          return newJadwal;
+                        });
+
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (protectedPins.includes(val)) {
+                          toast.error(`Pin ${val} diproteksi`);
                           setJadwal((prev) => {
                             const newJadwal = [...prev];
-                            newJadwal[idx].pin = val;
+                            newJadwal[idx].pin = "";
                             return newJadwal;
                           });
-                        } else {
-                          toast.error(`Pin ${val} diproteksi`);
-                        }
+                        } 
                       }}
                       placeholder="Pin"
                       title="Nomor Pin GPIO"
@@ -360,6 +393,15 @@ export default function LeleInfoCard() {
                 ))}
 
                 <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-2 md:gap-0">
+
+                  <input
+                    type="text"
+                    className="border rounded px-2 py-1 w-48"
+                    value={newDeskripsi}
+                    onChange={(e) => setNewDeskripsi(e.target.value)}
+                    placeholder="Deskripsi jadwal"
+                  />
+
                   <select
                     className="border rounded px-2 py-1"
                     value={newHari}
@@ -401,22 +443,31 @@ export default function LeleInfoCard() {
                     className="border rounded px-2 py-1 w-34"
                     value={newPin}
                     onChange={(e) => {
-                      const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
                     
-                      // Kalau input kosong, biarin supaya bisa dihapus
-                      if (val === "") {
+                      setNewPin(e.target.value); // Selalu simpan input mentah dulu
+                    }}
+                    onBlur={(e) => {
+                      // Jika kosong, biarin
+                      const raw = e.target.value;
+                      if (raw === "") return;
+                    
+                      const val = parseInt(raw, 10);
+                    
+                      // Jika bukan angka valid (NaN) atau di luar batas, keluar
+                      if (isNaN(val) || val < 0 || val > 40) {
                         setNewPin("");
                         return;
                       }
                     
-                      if (!protectedPins.includes(val)) {
-                        setNewPin(val);
-                      } else {
+                      if (protectedPins.includes(val)) {
                         toast.error(`Pin ${val} diproteksi`);
-                        // Kalau mau reset input ke kosong atau tetap nilai lama, bisa disesuaikan
+                        // Tetap boleh nunjukin nilainya, tapi jangan dianggap valid
                         setNewPin("");
+                        return;
                       }
-                    }}
+                    
+                      setNewPin(val);
+                    }} 
                     placeholder="Pin"
                     title="Nomor Pin GPIO"
                   />

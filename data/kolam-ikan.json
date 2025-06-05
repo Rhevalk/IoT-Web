@@ -1,39 +1,29 @@
 {
   "NilaInfo": {
     "type": "Nila",
-    "ikanHidup": "100",
+    "ikanHidup": "1000000000000000000000000000000000000000",
     "ikanMati": "0",
     "jadwal": [
       {
         "hari": "Senin",
-        "start": "12:34:06",
-        "end": "12:39:01",
-        "pin": 1
-      },
-      {
-        "hari": "Sabtu",
-        "start": "12:01:14",
-        "end": "12:01:15",
-        "pin": 14
+        "start": "23:48:07",
+        "end": "23:49:19",
+        "pin": 1,
+        "deskripsi": "Pakan"
       }
     ]
   },
   "LeleInfo": {
     "type": "Lele",
-    "ikanHidup": "150",
-    "ikanMati": "12",
+    "ikanHidup": "100**10",
+    "ikanMati": "-1",
     "jadwal": [
       {
-        "hari": "Jumat",
-        "start": "12:56:42",
-        "end": "12:01:43",
-        "pin": 1
-      },
-      {
-        "hari": "Rabu",
-        "start": "12:56:49",
-        "end": "16:56:49",
-        "pin": 5
+        "hari": "Senin",
+        "start": "23:49:25",
+        "end": "23:49:27",
+        "pin": 1,
+        "deskripsi": "Pakan"
       }
     ]
   }

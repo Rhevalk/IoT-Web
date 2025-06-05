@@ -14,6 +14,9 @@ interface MediumCardProps {
   lowColor?: string;
   midColor?: string;
   highColor?: string;
+  lowHEX?:string;
+  midHEX?:string;
+  highHEX?:string;
   thresholds?: {
     low: number;
     high: number;
@@ -29,6 +32,11 @@ const MediumCard: React.FC<MediumCardProps> = ({
   lowColor = "text-blue-500",
   midColor = "text-yellow-500",
   highColor = "text-red-500",
+
+  lowHEX = "#3b82f6",     // text-blue-500
+  midHEX = "#eab308",     // text-yellow-500
+  highHEX = "#ef4444",    // text-red-500
+
   thresholds = { low: 20, high: 30 },
   chartData,
 }) => {
@@ -37,6 +45,13 @@ const MediumCard: React.FC<MediumCardProps> = ({
     if (value <= thresholds.low) return lowColor;
     if (value <= thresholds.high) return midColor;
     return highColor;
+  };
+
+  const getValueHEX = () => {
+    if (typeof value !== "number") return "#9ca3af";
+    if (value <= thresholds.low) return lowHEX;
+    if (value <= thresholds.high) return midHEX;
+    return highHEX;
   };
 
   return (
@@ -57,7 +72,7 @@ const MediumCard: React.FC<MediumCardProps> = ({
       {chartData && chartData.length > 1 && (
         <ResponsiveContainer width="100%" height={40}>
           <LineChart data={chartData}>
-            <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="value" stroke={getValueHEX()} strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       )}

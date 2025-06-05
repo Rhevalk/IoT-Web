@@ -9,9 +9,9 @@ import ChartCard from "@/components/card/ChartCard";
 import { useEffect, useState } from "react";
 
 const menuOps = [
-  { name: "Data", href: "/data", icon: "/nav-icon/log-f.svg" },
-  { name: "Home", href: "/", icon: "/nav-icon/home-f.svg" },
-  { name: "Admin", href: "/admin", icon: "/nav-icon/admin-f.svg" },
+  { name: "Data", href: "/data", icon_f: "/nav-icon/log-f.svg", color: "bg-blue-400"     , icon_s: "/nav-icon/log-s.svg"},
+  { name: "Home", href: "/", icon_f: "/nav-icon/home-f.svg", color: "bg-orange-400"      , icon_s: "/nav-icon/home-s.svg"},
+  { name: "Admin", href: "/admin", icon_f: "/nav-icon/admin-f.svg", color: "bg-green-400", icon_s: "/nav-icon/admin-s.svg"},
 ];
 
 interface MyDataType {
@@ -31,6 +31,17 @@ interface MyDataJsonType {
 
 type ChartValue = { value: number };
 
+type DataPoint = { name: string; value: number };
+type ChartData = Record<"1d" | "1w" | "1m" | "6m", DataPoint[]>;
+
+interface ApiDataItem {
+  createdAt: string;
+  value?: number;
+  suhu_air?: number;
+  tds?: number;
+  // field lain sesuai API
+}
+
 export default function Log() {  
   /*===============================MENGAMBIL DATA================================================*/
   const [data, setData] = useState<MyDataType | null>(null);
@@ -38,8 +49,9 @@ export default function Log() {
     const fetchData = () => {
       fetch("/api/data-post?file=hidroponik")
         .then((res) => res.json())
-        .then((json) => setData(json['HidroponikInfo']))
+        .then((json) => setData(json["HidroponikInfo"]))
         .catch((err) => console.error("Gagal ambil data:", err));
+
     };
 
     fetchData();
@@ -97,6 +109,38 @@ export default function Log() {
 
   }, [data]);
 
+    /*===============================MENGAMBIL DATA CHART================================================*/
+  const [chartData, setChartData] = useState<ChartData>({
+    "1d": [],
+    "1w": [],
+    "1m": [],
+    "6m": [],
+  });
+
+  const fetchData = async (range: keyof ChartData) => {
+    const file = "hidroponik";
+    try {
+      const res = await fetch(`/api/data-sql?file=${file}&range=${range}`);
+      if (!res.ok) throw new Error("Failed to fetch data");
+      const data: ApiDataItem[] = await res.json();
+
+      if (!Array.isArray(data)) {
+        console.error("API data is not an array");
+        setChartData(prev => ({ ...prev, [range]: [] }));
+        return;
+      }
+
+      const processedData: DataPoint[] = data.map(item => ({
+        name: new Date(item.createdAt).toLocaleString(),
+        value: item.tds ?? 0,
+      }));
+
+      setChartData(prev => ({ ...prev, [range]: processedData }));
+    } catch (error) {
+      console.error("Error fetching chart data:", error);
+    }
+  };
+  
   return (
     <div className="flex flex-col h-auto pb-32 text-[#424242]">
       <Menu opsi={menuOps}/>
@@ -157,6 +201,10 @@ export default function Log() {
                   lowColor="text-red-500"
                   midColor="text-green-500"
                   highColor="text-blue-500"
+                  
+                  lowHEX="#ef4444"
+                  midHEX="#22c55e"
+                  highHEX="#3b82f6"
 
                   chartData={chartKelembapan}
               />
@@ -176,6 +224,10 @@ export default function Log() {
                   lowColor="text-red-500"
                   midColor="text-green-500"
                   highColor="text-blue-500"
+
+                  lowHEX="#ef4444"
+                  midHEX="#22c55e"
+                  highHEX="#3b82f6"
 
                   chartData={chartTds}
               />
@@ -198,6 +250,10 @@ export default function Log() {
                   midColor="text-green-500"
                   highColor="text-blue-500"
 
+                  lowHEX="#ef4444"
+                  midHEX="#22c55e"
+                  highHEX="#3b82f6"
+
                   chartData={chartDebit}
               />
             
@@ -215,6 +271,10 @@ export default function Log() {
                   midColor="text-yellow-500"
                   highColor="text-red-500"
 
+                  lowHEX="#3b82f6"
+                  midHEX="#eab308"
+                  highHEX="#ef4444"
+
                   chartData={chartSuhuAir}
               />
           </div>
@@ -224,7 +284,11 @@ export default function Log() {
         {/* Extra Full Width Boxes */}
         <div className="mt-6 space-y-6">
           <div className="w-full h-auto rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all duration-200">
-            <ChartCard label="Grafik TDS" color="#2563eb"  />{/* data={myChartData} */}
+            <ChartCard
+              label="Data TDS"
+              data={chartData}
+              onRangeChange={fetchData}
+            />
           </div>
         </div>
       </main>

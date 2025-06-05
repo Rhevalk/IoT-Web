@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model SensorEntry {
+  id              Int      @id @default(autoincrement())
+  file            String   // seperti: "hidroponik", "kolam_ikan"
+  tipe            String   // seperti: "HidroponikInfo", "NilaInfo", "LeleInfo"
+  status          Int
+  suhu_air        Int
+  suhu_udara      Int?
+  kelembapan_udara Int?
+  tds             Int?
+  debit           Int
+  createdAt       DateTime @default(now())
+}
+
+
+
+enum SensorType {
+  SUHU_UDARAbuatk
+  SUHU_AIR
+  KELEMBAPAN_UDARA
+  YDS
+  DEBIT
+}
+

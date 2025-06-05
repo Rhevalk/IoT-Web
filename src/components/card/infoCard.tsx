@@ -22,10 +22,10 @@ function InfoCard({
   detailItems: { label: string; value: React.ReactNode }[];
 }) {
   const colorClass = {
-    green: "bg-green-600",
+    green: "bg-green-500",
     orange: "bg-orange-500",
-    blue: "bg-blue-600",
-    gray: "bg-gray-600",
+    blue: "bg-blue-500",
+    gray: "bg-gray-500",
   }[color];
 
   return (

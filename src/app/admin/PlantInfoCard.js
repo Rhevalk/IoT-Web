@@ -32,6 +32,7 @@ export default function PlantInfoCard() {
   const [newStartTime, setNewStartTime] = useState("");
   const [newEndTime, setNewEndTime] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [newDeskripsi, setNewDeskripsi] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,7 +59,13 @@ export default function PlantInfoCard() {
       !isDuplicate(newHari, newStartTime, newEndTime, newPin)
     ) {
       setJadwal((prev) =>
-        [...prev, { hari: newHari, start: newStartTime, end: newEndTime, pin: newPin }].sort((a, b) => {
+        [...prev, {
+          hari: newHari,
+          start: newStartTime,
+          end: newEndTime,
+          pin: newPin,
+          deskripsi: newDeskripsi || "" // optional
+        }].sort((a, b) => {
           const hariA = hariOptions.indexOf(a.hari);
           const hariB = hariOptions.indexOf(b.hari);
           if (hariA !== hariB) return hariA - hariB;
@@ -69,8 +76,10 @@ export default function PlantInfoCard() {
       setNewEndTime("");
       setNewHari("");
       setNewPin("");
+      setNewDeskripsi("");
     }
   };
+
 
   const hapusJadwal = (idx) => {
     setJadwal((prev) => prev.filter((_, i) => i !== idx));
@@ -109,8 +118,10 @@ export default function PlantInfoCard() {
         const res = await fetch('/api/data-get?file=hidroponik');
         if (res.ok) {
           const data = await res.json();
-          setPlantInfo(data["plantInfo"]);
-          setJadwal(data["plantInfo"]["jadwal"]);
+          if(data["plantInfo"]) {
+            setPlantInfo(data["plantInfo"]);
+            setJadwal(data["plantInfo"]["jadwal"]);
+          } 
         } else {
           console.error('Gagal fetch data jadwal');
         }
@@ -139,7 +150,7 @@ export default function PlantInfoCard() {
           </svg>
           <h1 className="text-white text-2xl font-semibold">Hidroponik</h1>
         </div>
-        <p className="text-white">Atur jadwal pencahayaan dan catat perkembangan tanaman</p>
+        <p className="text-white">Atur jadwal dan catat perkembangan tanaman</p>
       </div>
 
       <div className="flex flex-col space-y-1.5 p-6">
@@ -232,7 +243,7 @@ export default function PlantInfoCard() {
           {!isEditMode && (
             <div>
               <label className="text-xl leading-none font-semibold">
-                Jadwal Pencahayaan:
+                Jadwal:
               </label>
               <ul className="list-disc list-inside ml-4 mt-1 text-base">
                 {jadwal.length === 0 ? (
@@ -240,7 +251,7 @@ export default function PlantInfoCard() {
                 ) : (
                   jadwal.map((item, idx) => (
                     <li key={idx}>
-                      <strong>{item.hari}:</strong> {item.start} -- {item.end} (Pin: {item.pin})
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
                     </li>
                   ))
                 )}
@@ -251,11 +262,27 @@ export default function PlantInfoCard() {
           {isEditMode && (
             <div>
               <label className="text-xl leading-none font-semibold">
-                Jadwal Pencahayaan:
+                Jadwal:
               </label>
               <div className="space-y-2 mt-1">
                 {jadwal.map((item, idx) => (
                   <div key={idx} className="flex md:items-center space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+
+                    <input
+                      type="text"
+                      className="border rounded px-2 py-1 w-48"
+                      value={item.deskripsi || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].deskripsi = val;
+                          return newJadwal;
+                        });
+                      }}
+                      placeholder="Deskripsi jadwal"
+                    />
+
                     <select
                       className="border rounded px-2 py-1"
                       value={item.hari}
@@ -317,16 +344,23 @@ export default function PlantInfoCard() {
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
-                      
-                        if (!protectedPins.includes(val)) {
+                        setJadwal((prev) => {
+                          const newJadwal = [...prev];
+                          newJadwal[idx].pin = val;
+                          return newJadwal;
+                        });
+
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (protectedPins.includes(val)) {
+                          toast.error(`Pin ${val} diproteksi`);
                           setJadwal((prev) => {
                             const newJadwal = [...prev];
-                            newJadwal[idx].pin = val;
+                            newJadwal[idx].pin = "";
                             return newJadwal;
                           });
-                        } else {
-                          toast.error(`Pin ${val} diproteksi`);
-                        }
+                        } 
                       }}
                       placeholder="Pin"
                       title="Nomor Pin GPIO"
@@ -360,6 +394,15 @@ export default function PlantInfoCard() {
                 ))}
 
                 <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-2 md:gap-0">
+
+                  <input
+                    type="text"
+                    className="border rounded px-2 py-1 w-48"
+                    value={newDeskripsi}
+                    onChange={(e) => setNewDeskripsi(e.target.value)}
+                    placeholder="Deskripsi jadwal"
+                  />
+
                   <select
                     className="border rounded px-2 py-1"
                     value={newHari}
@@ -401,26 +444,34 @@ export default function PlantInfoCard() {
                     className="border rounded px-2 py-1 w-34"
                     value={newPin}
                     onChange={(e) => {
-                      const val = e.target.value === "" ? "" : parseInt(e.target.value, 10);
+                      setNewPin(e.target.value); // Selalu simpan input mentah dulu
+                    }}
+                    onBlur={(e) => {
+                      // Jika kosong, biarin
+                      const raw = e.target.value;
+                      if (raw === "") return;
                     
-                      // Kalau input kosong, biarin supaya bisa dihapus
-                      if (val === "") {
+                      const val = parseInt(raw, 10);
+                    
+                      // Jika bukan angka valid (NaN) atau di luar batas, keluar
+                      if (isNaN(val) || val < 0 || val > 40) {
                         setNewPin("");
                         return;
                       }
                     
-                      if (!protectedPins.includes(val)) {
-                        setNewPin(val);
-                      } else {
+                      if (protectedPins.includes(val)) {
                         toast.error(`Pin ${val} diproteksi`);
-                        // Kalau mau reset input ke kosong atau tetap nilai lama, bisa disesuaikan
+                        // Tetap boleh nunjukin nilainya, tapi jangan dianggap valid
                         setNewPin("");
+                        return;
                       }
-                    }}
+                    
+                      setNewPin(val);
+                    }} 
                     placeholder="Pin"
                     title="Nomor Pin GPIO"
                   />
-
+                                    
                   <button
                     onClick={tambahJadwal}
                     className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"

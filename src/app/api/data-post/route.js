@@ -1,4 +1,4 @@
-let dataMap = new Map(); // Menyimpan data per post
+let dataMap = new Map(); // Menyimpan data terakhir per post
 
 export async function POST(request) {
   const { searchParams } = new URL(request.url);
