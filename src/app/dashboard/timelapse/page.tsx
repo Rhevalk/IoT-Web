@@ -1,9 +1,8 @@
-import Menu from "@/components/layout/menu"
 
 export default function Log() {
     return(
         <div>
-            <Menu></Menu>
+            <h1>Timelapse is being prepered</h1>
         </div>
     );
 }
