@@ -26,6 +26,7 @@ type JadwalItem = {
   end: string;
   pin: number;
   deskripsi: number;
+  pengecualian: [];
 };
 
 export default function Home() {
@@ -140,7 +141,16 @@ export default function Home() {
                     {dataJson_H_list.length > 0 ? (
                       dataJson_H_list.map((item, i) => (
                         <li key={i}>
-                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+                           
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>(
+                      {item.hari === "Setiap Hari" 
+                        ? (item.pengecualian && item.pengecualian.length > 0
+                            ? `Setiap Hari,  <${item.pengecualian.join(", ")}>`
+                            : "Setiap Hari")
+                        : item.hari
+                      }
+                    )</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
                         </li>
                       ))
                     ) : (
@@ -187,7 +197,16 @@ export default function Home() {
                     {dataJson_N_list.length > 0 ? (
                       dataJson_N_list.map((item, i) => (
                         <li key={i}>
-                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+                           
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>(
+                      {item.hari === "Setiap Hari" 
+                        ? (item.pengecualian && item.pengecualian.length > 0
+                            ? `Setiap Hari,  <${item.pengecualian.join(", ")}>`
+                            : "Setiap Hari")
+                        : item.hari
+                      }
+                    )</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
                         </li>
                       ))
                     ) : (
@@ -219,7 +238,16 @@ export default function Home() {
                     {dataJson_L_list.length > 0 ? (
                       dataJson_L_list.map((item, i) => (
                         <li key={i}>
-                          <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+                          
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>(
+                      {item.hari === "Setiap Hari" 
+                        ? (item.pengecualian && item.pengecualian.length > 0
+                            ? `Setiap Hari,  <${item.pengecualian.join(", ")}>`
+                            : "Setiap Hari")
+                        : item.hari
+                      }
+                    )</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
                         </li>
                       ))
                     ) : (

@@ -14,7 +14,7 @@ const hariOptions = [
   "Minggu",
 ];
 
-const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15]; 
+const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15, 32, 33, 34, 35, 25, 26]; 
 
 export default function NilaInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
@@ -33,6 +33,9 @@ export default function NilaInfoCard() {
   const [newPin, setNewPin] = useState("");
   const [newDeskripsi, setNewDeskripsi] = useState("");
 
+  const [exceptions, setExceptions] = useState([]); 
+  const [isSetiapHari, setIsSetiapHari] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNilaInfo((prev) => ({ ...prev, [name]: value }));
@@ -49,35 +52,40 @@ export default function NilaInfoCard() {
     );
   };
 
-  // fungsi menambahkan jadwal
-  const tambahJadwal = () => {
-    if (
-      newStartTime &&
-      newEndTime &&
-      newPin !== "" &&
-      !isDuplicate(newHari, newStartTime, newEndTime, newPin)
-    ) {
-      setJadwal((prev) =>
-        [...prev, {
-          hari: newHari,
-          start: newStartTime,
-          end: newEndTime,
-          pin: newPin,
-          deskripsi: newDeskripsi || "" // optional
-        }].sort((a, b) => {
-          const hariA = hariOptions.indexOf(a.hari);
-          const hariB = hariOptions.indexOf(b.hari);
-          if (hariA !== hariB) return hariA - hariB;
-          return a.start.localeCompare(b.start);
-        })
-      );
-      setNewStartTime("");
-      setNewEndTime("");
-      setNewHari("");
-      setNewPin("");
-      setNewDeskripsi("");
-    }
-  };
+ // fungsi menambahkan jadwal
+const tambahJadwal = () => {
+  if (
+    newStartTime &&
+    newEndTime &&
+    newPin !== "" &&
+    !isDuplicate(newHari, newStartTime, newEndTime, newPin)
+  ) {
+    setJadwal((prev) =>
+      [...prev, {
+        hari: newHari,
+        pengecualian: newHari === "Setiap Hari" ? exceptions : [],
+        start: newStartTime,
+        end: newEndTime,
+        pin: newPin,
+        deskripsi: newDeskripsi || ""
+      }].sort((a, b) => {
+        const hariA = hariOptions.indexOf(a.hari);
+        const hariB = hariOptions.indexOf(b.hari);
+        if (hariA !== hariB) return hariA - hariB;
+        return a.start.localeCompare(b.start);
+      })
+    );
+    // Reset form
+    setNewStartTime("");
+    setNewEndTime("");
+    setNewHari("Senin");
+    setNewPin("");
+    setNewDeskripsi("");
+    setExceptions([]);
+    setIsSetiapHari(false);
+  }
+};
+
 
   const hapusJadwal = (idx) => {
     setJadwal((prev) => prev.filter((_, i) => i !== idx));
@@ -249,7 +257,16 @@ export default function NilaInfoCard() {
                 ) : (
                   jadwal.map((item, idx) => (
                     <li key={idx}>
-                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>(
+                      {item.hari === "Setiap Hari" 
+                        ? (item.pengecualian && item.pengecualian.length > 0
+                            ? `Setiap Hari,  <${item.pengecualian.join(", ")}>`
+                            : "Setiap Hari")
+                        : item.hari
+                      }
+                    )</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
                     </li>
                   ))
                 )}
@@ -279,6 +296,7 @@ export default function NilaInfoCard() {
                       }}
                       placeholder="Deskripsi jadwal"
                     />
+
                     <select
                       className="border rounded px-2 py-1"
                       value={item.hari}
@@ -287,6 +305,9 @@ export default function NilaInfoCard() {
                         setJadwal((prev) => {
                           const newJadwal = [...prev];
                           newJadwal[idx].hari = val;
+                          if (val !== "Setiap Hari") {
+                            newJadwal[idx].pengecualian = [];
+                          }
                           return newJadwal;
                         });
                       }}
@@ -296,7 +317,40 @@ export default function NilaInfoCard() {
                           {h}
                         </option>
                       ))}
+                      <option value="Setiap Hari">Setiap Hari</option>
                     </select>
+                    
+                    {item.hari === "Setiap Hari" && (
+                      <div className="mt-2">
+                        <p>Pilih pengecualian:</p>
+                        {hariOptions.map((h, i) => (
+                          <label key={i} className="block">
+                            <input
+                              type="checkbox"
+
+                              onChange={() => {
+                                setJadwal((prev) => {
+                                  const newJadwal = [...prev];
+                                  newJadwal[idx] = { ...newJadwal[idx] };
+                                  const pengecualian = newJadwal[idx].pengecualian || [];
+                                  const isIncluded = pengecualian.includes(h);
+                                
+                                  newJadwal[idx].pengecualian = isIncluded
+                                    ? pengecualian.filter((day) => day !== h)
+                                    : [...pengecualian, h];
+                                
+                                  console.log('Update pengecualian:', newJadwal[idx].pengecualian);
+                                
+                                  return newJadwal;
+                                });
+                              }}
+                            
+                            />
+                            <span className="ml-2">{h}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
 
                     <input
                       type="time"
@@ -399,17 +453,49 @@ export default function NilaInfoCard() {
                     placeholder="Deskripsi jadwal"
                   />
 
+
                   <select
                     className="border rounded px-2 py-1"
                     value={newHari}
-                    onChange={(e) => setNewHari(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNewHari(val);
+                      setIsSetiapHari(val === "Setiap Hari");
+                      if (val !== "Setiap Hari") {
+                        setExceptions([]);
+                      }
+                    }}
                   >
                     {hariOptions.map((h, i) => (
                       <option key={i} value={h}>
                         {h}
                       </option>
                     ))}
+                    <option value="Setiap Hari">Setiap Hari</option>
                   </select>
+                  
+                  {isSetiapHari && (
+                    <div className="mt-2">
+                      <p>Pilih hari yang dikecualikan:</p>
+                      {hariOptions.map((h, i) => (
+                        <label key={i} className="block">
+                          <input
+                            type="checkbox"
+                            checked={exceptions.includes(h)}
+                            onChange={() => {
+                              setExceptions((prev) =>
+                                prev.includes(h)
+                                  ? prev.filter((day) => day !== h)
+                                  : [...prev, h]
+                              );
+                            }}
+                          />
+                          <span className="ml-2">{h}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+
 
                   <input
                     type="time"

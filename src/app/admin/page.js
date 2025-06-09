@@ -13,7 +13,6 @@ const menuOps = [
   { name: "Admin", href: "/admin", icon_f: "/nav-icon/admin-f.svg", color: "bg-green-400", icon_s: "/nav-icon/admin-s.svg"},
 ];
 
-
 export default async function AdminPage() {
   const cookieStore = await cookies();
   const adminSession = cookieStore.get('admin_session');
@@ -21,7 +20,6 @@ export default async function AdminPage() {
   if (!adminSession) {
     redirect('/login');
   }
-
 
   return (
     <div className="pb-18">

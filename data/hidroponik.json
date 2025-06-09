@@ -5,11 +5,30 @@
     "harvestDate": "34 April 1231",
     "jadwal": [
       {
-        "hari": "Senin",
-        "start": "23:29:39",
-        "end": "23:30:40",
+        "hari": "Setiap Hari",
+        "pengecualian": [
+          "Senin",
+          "Selasa",
+          "Rabu",
+          "Kamis"
+        ],
+        "start": "19:02:22",
+        "end": "23:56:24",
         "pin": 1,
-        "deskripsi": "Pencahayaan"
+        "deskripsi": "ssc"
+      },
+      {
+        "hari": "Setiap Hari",
+        "pengecualian": [
+          "Senin",
+          "Selasa",
+          "Rabu",
+          "Kamis"
+        ],
+        "start": "19:41:09",
+        "end": "19:41:10",
+        "pin": 1,
+        "deskripsi": "daad"
       }
     ]
   }

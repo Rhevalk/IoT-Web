@@ -20,6 +20,7 @@ interface MyDataJsonType {
   end : string
   pin : string
   deskripsi : string
+  pengecualian : []
 }
 
 type ChartValue = { value: number };
@@ -157,7 +158,16 @@ const fetchData = async (range: keyof ChartData) => {
                     {dataJson.length > 0 ? (
                       dataJson.map((item, i) => (
                         <li key={i}>
-                           <strong>{item?.deskripsi ? `${item.deskripsi} : ` : ""}</strong> <strong>({item.hari})</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+                           
+                      <strong>{item?.deskripsi ?? ""}</strong> : <strong>(
+                      {item.hari === "Setiap Hari" 
+                        ? (item.pengecualian && item.pengecualian.length > 0
+                            ? `Setiap Hari,  <${item.pengecualian.join(", ")}>`
+                            : "Setiap Hari")
+                        : item.hari
+                      }
+                    )</strong> {item.start} -- {item.end} [Pin: {item.pin}]
+
                         </li>
                       ))
                     ) : (

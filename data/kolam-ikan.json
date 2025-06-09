@@ -5,11 +5,17 @@
     "ikanMati": "0",
     "jadwal": [
       {
-        "hari": "Senin",
-        "start": "23:48:07",
-        "end": "23:49:19",
+        "hari": "Setiap Hari",
+        "pengecualian": [
+          "Rabu",
+          "Kamis",
+          "Jumat",
+          "Selasa"
+        ],
+        "start": "19:57:00",
+        "end": "19:57:02",
         "pin": 1,
-        "deskripsi": "Pakan"
+        "deskripsi": "dwadaw"
       }
     ]
   },
@@ -20,10 +26,11 @@
     "jadwal": [
       {
         "hari": "Senin",
-        "start": "23:49:25",
-        "end": "23:49:27",
-        "pin": 1,
-        "deskripsi": "Pakan"
+        "pengecualian": [],
+        "start": "19:57:34",
+        "end": "19:58:36",
+        "pin": 3,
+        "deskripsi": "wdadaw"
       }
     ]
   }
