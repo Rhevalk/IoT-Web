@@ -208,7 +208,7 @@ const tambahJadwal = () => {
               name="type"
               value={plantInfo.type}
               onChange={handleChange}
-              className="border rounded px-2 py-1 w-full"
+              className="border border-gray-400 rounded px-2 py-1 w-full"
             />
           ) : (
             <p>{plantInfo.type}</p>
@@ -224,7 +224,7 @@ const tambahJadwal = () => {
               name="plantingDate"
               value={plantInfo.plantingDate}
               onChange={handleChange}
-              className="border rounded px-2 py-1 w-full"
+              className="border border-gray-400 rounded px-2 py-1 w-full"
             />
           ) : (
             <p>{plantInfo.plantingDate}</p>
@@ -240,7 +240,7 @@ const tambahJadwal = () => {
               name="harvestDate"
               value={plantInfo.harvestDate}
               onChange={handleChange}
-              className="border rounded px-2 py-1 w-full"
+              className="border border-gray-400 rounded px-2 py-1 w-full"
             />
           ) : (
             <p>{plantInfo.harvestDate}</p>
@@ -276,18 +276,21 @@ const tambahJadwal = () => {
             </div>
           )}
 
+{/*================================================EDIT MODE=================================================================================*/}
           {isEditMode && (
             <div>
               <label className="text-xl leading-none font-semibold">
                 Jadwal:
               </label>
-              <div className="space-y-2 mt-1">
+              <div className="space-y-10 mt-1">
                 {jadwal.map((item, idx) => (
-                  <div key={idx} className="flex md:items-center space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+                  <div key={idx} className="flex md:items-start space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+
+                  {/*==============================INPUT DESKRIPSI==================================================*/}
 
                     <input
                       type="text"
-                      className="border rounded px-2 py-1 w-48"
+                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                       value={item.deskripsi || ""}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -300,9 +303,9 @@ const tambahJadwal = () => {
                       placeholder="Deskripsi jadwal"
                     />
 
-
+                  {/*==============================INPUT HARI==================================================*/}
                     <select
-                      className="border rounded px-2 py-1"
+                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                       value={item.hari}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -323,15 +326,16 @@ const tambahJadwal = () => {
                       ))}
                       <option value="Setiap Hari">Setiap Hari</option>
                     </select>
-                    
+
+                  {/*==============================INPUT PENGECUALIAN==================================================*/}
                     {item.hari === "Setiap Hari" && (
-                      <div className="mt-2">
-                        <p>Pilih pengecualian:</p>
+                      <div className="border border-gray-400 px-3 py-1 rounded max-h-9.5 overflow-y-auto md:w-48 w-full">
+                        <p>Pengecualian:</p>
                         {hariOptions.map((h, i) => (
                           <label key={i} className="block">
                             <input
                               type="checkbox"
-
+                              checked={jadwal[idx]?.pengecualian?.includes(h) || false}
                               onChange={() => {
                                 setJadwal((prev) => {
                                   const newJadwal = [...prev];
@@ -343,12 +347,9 @@ const tambahJadwal = () => {
                                     ? pengecualian.filter((day) => day !== h)
                                     : [...pengecualian, h];
                                 
-                                  console.log('Update pengecualian:', newJadwal[idx].pengecualian);
-                                
                                   return newJadwal;
                                 });
                               }}
-                            
                             />
                             <span className="ml-2">{h}</span>
                           </label>
@@ -356,11 +357,13 @@ const tambahJadwal = () => {
                       </div>
                     )}
 
+                  {/*==============================INPUT WAKTU MULAI==================================================*/}
+                  <div className='w-full md:w-auto flex justify-between md:justify-start gap-1'>
 
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-34"
+                      className="border border-gray-400 rounded px-2 py-1 w-34"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -375,10 +378,11 @@ const tambahJadwal = () => {
 
                     <h1>--</h1>
 
+                  {/*==============================INPUT WAKTU SELESAI==================================================*/}
                     <input
                       type="time"
                       step="1"
-                      className="border rounded px-2 py-1 w-34"
+                      className="border border-gray-400 rounded px-2 py-1 w-34"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -391,11 +395,14 @@ const tambahJadwal = () => {
                       title="Jam Selesai"
                     />
 
+                  </div>
+
+                  {/*==============================INPUT PIN==================================================*/}
                     <input
                       type="number"
                       min={0}
                       max={40}
-                      className="border rounded px-2 py-1 w-34"
+                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
@@ -423,7 +430,7 @@ const tambahJadwal = () => {
 
                     <button
                       onClick={() => hapusJadwal(idx)}
-                      className="inline-flex items-center border-1 border-red-500 justify-center h-10 w-10 rounded-md text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500"
+                      className="inline-flex items-center border-1 border-red-500 justify-center h-10 md:w-10 w-full rounded-md text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500"
                       title="Hapus Jadwal"
                     >
                       <svg
@@ -448,18 +455,21 @@ const tambahJadwal = () => {
                   </div>
                 ))}
 
+{/*================================================NEW MODE=================================================================================*/}
                 <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-2 md:gap-0">
 
+                  {/*==============================INPUT DEKSRIPSI==================================================*/}
                   <input
                     type="text"
-                    className="border rounded px-2 py-1 w-48"
+                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                     value={newDeskripsi}
                     onChange={(e) => setNewDeskripsi(e.target.value)}
                     placeholder="Deskripsi jadwal"
                   />
 
+                  {/*==============================INPUT HARI==================================================*/}
                   <select
-                    className="border rounded px-2 py-1"
+                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                     value={newHari}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -478,9 +488,10 @@ const tambahJadwal = () => {
                     <option value="Setiap Hari">Setiap Hari</option>
                   </select>
                   
+                  {/*==============================INPUT PENECUALIAN==================================================*/}         
                   {isSetiapHari && (
-                    <div className="mt-2">
-                      <p>Pilih hari yang dikecualikan:</p>
+                    <div className="border border-gray-400 px-3 py-1 rounded max-h-9.5 overflow-y-auto md:w-48 w-full">
+                      <p>Pengecualian:</p>
                       {hariOptions.map((h, i) => (
                         <label key={i} className="block">
                           <input
@@ -500,11 +511,12 @@ const tambahJadwal = () => {
                     </div>
                   )}
 
-
+                  {/*==============================INPUT WAKTU MULAI==================================================*/}  
+                <div className='w-full md:w-auto flex justify-between md:justify-start gap-1'>
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-34"
+                    className="border border-gray-400 rounded px-2 py-1 w-34"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -513,21 +525,25 @@ const tambahJadwal = () => {
 
                   <h1>--</h1>
 
+                  {/*==============================INPUT WAKTU SELESAI==================================================*/}  
                   <input
                     type="time"
                     step="1"
-                    className="border rounded px-2 py-1 w-34"
+                    className="border border-gray-400 rounded px-2 py-1 w-34"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
                     title="Jam Selesai"
                   />
+                  
+                </div>
 
+                  {/*==============================INPUT PIN==================================================*/}  
                   <input
                     type="number"
                     min={0}
                     max={40}
-                    className="border rounded px-2 py-1 w-34"
+                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
                     value={newPin}
                     onChange={(e) => {
                       setNewPin(e.target.value); // Selalu simpan input mentah dulu
@@ -560,7 +576,7 @@ const tambahJadwal = () => {
                                     
                   <button
                     onClick={tambahJadwal}
-                    className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    className="inline-flex items-center justify-center h-10 md:w-10 w-full rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
                     aria-label="Tambah jadwal pakan"
                   >
                     <svg

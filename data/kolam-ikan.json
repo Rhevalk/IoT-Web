@@ -25,8 +25,11 @@
     "ikanMati": "-1",
     "jadwal": [
       {
-        "hari": "Senin",
-        "pengecualian": [],
+        "hari": "Setiap Hari",
+        "pengecualian": [
+          "Kamis",
+          "Minggu"
+        ],
         "start": "19:57:34",
         "end": "19:58:36",
         "pin": 3,
