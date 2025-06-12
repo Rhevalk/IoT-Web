@@ -1,0 +1,17 @@
+{
+  "config": {
+    "fps": 1,
+    "max_images": 10,
+    "interval_seconds": 10,
+    "start_hour": 0,
+    "end_hour": 24,
+    "start_date": "1 Juni 2025",
+    "end_date": "15 Juni 2025",
+    "flash": true
+  },
+  "cam": {
+    "power": true,
+    "id": "cam1",
+    "name": "Kamera 1"
+  }
+}

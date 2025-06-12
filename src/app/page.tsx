@@ -29,6 +29,18 @@ type JadwalItem = {
   pengecualian: [];
 };
 
+type ConfigItem = {
+  status: boolean;
+  cam: {
+    id: string;
+    name: string;
+  };
+  config: {
+    start_date: string;
+    end_date: string;
+  };
+};
+
 export default function Home() {
 
   /*===============================CEK STATUS CLIENT================================================*/
@@ -115,6 +127,14 @@ export default function Home() {
     fetchAndSetJadwal('kolam-ikan', 'LeleInfo', setDataJson_L, setDataJson_L_list);
   }, []);
 
+  const [configs, setConfigs] = useState<ConfigItem[]>([]);
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => setConfigs(data))
+      .catch(err => console.error('Gagal ambil semua config:', err));
+  }, []);
+
   return (
     <div className="overflow-y-auto h-full w-full pb-18 text-[#424242">
       <Menu opsi={menuOps}/>
@@ -167,13 +187,28 @@ export default function Home() {
             title="Timelapse"
             icon="/dashboard-icon/cam.svg"
             color="gray"
-            subtitle="Monitoring kondisi tanaman hidroponik"
+            subtitle="Lihat perkembangan tumbuhan"
             infoTitle="Info Timelapse"
-            status="Non-Aktif"
             detailItems={[
-              { label: "Durasi Video", value: "--:--" },
-              { label: "Tanggal Awal", value: "--:--" },
-              { label: "Tanggak Akhir", value: "--:--" },
+              { label: "Jumlah Perangkat", value: configs.length },
+              {
+                label: "Perangkat",
+                value: (
+                  <ul className="pl-4 space-y-1">
+                    {configs.length > 0 ? (
+                      configs.map((item, i) => (
+                        <li key={i} className="flex items-center">
+                          <span className={`w-4 h-4 ${item.status ? "bg-green-400" : "bg-red-400"} inline-block mt-1 mr-2 rounded-sm`}></span>
+
+                          <h1><strong>{item.cam.name}</strong> {`(${item.cam.id})`}</h1>
+                        </li>
+                      ))
+                    ) : (
+                      <li>Tidak ada perangkat</li>
+                    )}
+                  </ul>
+                ),
+              },
             ]}
           />
 

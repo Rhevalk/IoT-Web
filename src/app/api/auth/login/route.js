@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 
-const ADMIN_CODE = "admin123";
+const ADMIN_CODE = "cinFarm32";
 const HASHED_PASSWORD = "$2b$08$.N87MFT/XjDhUwNOkjzNouuGS/Scxk9bsxx8J0QLZVelJyrAt//Qm"; // hash password
 
 export async function POST(request) {

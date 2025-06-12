@@ -23,7 +23,9 @@ export async function PUT(req) {
     }
 
     const fileName = `${fileParam}.json`;
+
     const filePath = path.join(process.cwd(), 'data', fileName);
+
     const dirPath = path.dirname(filePath);
 
     // Buat folder jika belum ada

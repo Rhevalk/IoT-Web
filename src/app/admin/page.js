@@ -6,6 +6,7 @@ import Menu from "@/components/layout/menu"
 import PlantInfoCard from "./PlantInfoCard"
 import NilaInfoCard from "./NilaInfoCard"
 import LeleInfoCard from "./LeleInfoCard"
+import TimelapseCard from "./timelapseCard"
 
 const menuOps = [
   { name: "Data", href: "/data", icon_f: "/nav-icon/log-f.svg", color: "bg-blue-400"     , icon_s: "/nav-icon/log-s.svg"},
@@ -29,6 +30,7 @@ export default async function AdminPage() {
         <PlantInfoCard></PlantInfoCard>
         <NilaInfoCard></NilaInfoCard>
         <LeleInfoCard></LeleInfoCard>
+        <TimelapseCard/>
       </div>
 
     </div>

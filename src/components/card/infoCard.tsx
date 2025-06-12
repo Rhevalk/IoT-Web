@@ -18,7 +18,7 @@ function InfoCard({
   color: string;
   subtitle: string;
   infoTitle: string;
-  status: string;
+  status?: string;
   detailItems: { label: string; value: React.ReactNode }[];
 }) {
   const colorClass = {
@@ -49,17 +49,22 @@ function InfoCard({
             <h2 className="text-xl md:text-2xl font-medium">{infoTitle}:</h2>
           </div>
 
+          {status? (
+
           <div>
             <h3 className="text-lg font-medium">Status:</h3>
             <div className="flex items-center gap-2">
               <div
                 className={`${
-                  status === "Aktif" ? "bg-green-400" : "bg-red-400"
-                } h-4 w-4 rounded-full`}
-              ></div>
+                  status === "Aktif" || status === "Ready" ? "bg-green-400" : status === "Non-Aktif" ? "bg-red-400" : "bg-yellow-400"
+                  } h-4 w-4 rounded-full`}
+                  ></div>
               <p className="text-lg">{status}</p>
             </div>
           </div>
+          ) : (
+            <></>
+          )}
 
           {detailItems.map(({ label, value }, idx) => (
             <div key={idx}>

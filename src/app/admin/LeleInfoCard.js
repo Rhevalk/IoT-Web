@@ -141,19 +141,27 @@ const tambahJadwal = () => {
   return (
     <div className="hover:bg-[#f7f7f7] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] w-full mx-auto overflow-hidden text-[#424242]">
       <div className="bg-blue-600 bg-opacity-50 p-4">
-        <div className="flex items-center mb-1">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-8 w-8 mr-3 stroke-white"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-          </svg>
+          <div className="flex items-center mb-1 text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-fish h-8 w-8 mr-3"
+            >
+              <path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z" />
+              <path d="M18 12v.5" />
+              <path d="M16 17.93a9.77 9.77 0 0 1 0-11.86" />
+              <path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33" />
+              <path d="M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4" />
+              <path d="M16.01 17.93l-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98" />
+            </svg>
+
           <h1 className="text-white text-2xl font-semibold">Kolam Ikan Lele</h1>
         </div>
         <p className="text-white">Atur jadwal dan catat perkembangan ikan</p>
@@ -188,9 +196,25 @@ const tambahJadwal = () => {
             ) : (
               <button
                 onClick={handleSave}
-                className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700"
+                className="bg-green-600 text-white px-3 py-3 rounded-md text-sm hover:bg-green-700"
               >
-                Simpan
+                <svg
+								  xmlns="http://www.w3.org/2000/svg"
+								  width="24"
+								  height="24"
+								  viewBox="0 0 24 24"
+								  fill="none"
+								  stroke="currentColor"
+								  stroke-width="2"
+								  stroke-linecap="round"
+								  stroke-linejoin="round"
+								  className="lucide lucide-save h-5 w-5"
+								>
+														
+								  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />												
+							 		<polyline points="17 21 17 13 7 13 7 21 17 21" />										
+								  <polyline points="7 3 7 8 15 8 15 3" />
+								</svg>
               </button>
             )}
           </div>
@@ -207,7 +231,7 @@ const tambahJadwal = () => {
               name="type"
               value={LeleInfo.type}
               onChange={handleChange}
-              className="border border-gray-400 rounded px-2 py-1 w-full"
+              className="px-3 py-2 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)]"
             />
           ) : (
             <p>{LeleInfo.type}</p>
@@ -223,7 +247,7 @@ const tambahJadwal = () => {
               name="ikanHidup"
               value={LeleInfo.ikanHidup}
               onChange={handleChange}
-              className="border border-gray-400 rounded px-2 py-1 w-full"
+              className="px-3 py-2 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)]"
             />
           ) : (
             <p>{LeleInfo.ikanHidup}</p>
@@ -239,7 +263,7 @@ const tambahJadwal = () => {
               name="ikanMati"
               value={LeleInfo.ikanMati}
               onChange={handleChange}
-              className="border border-gray-400 rounded px-2 py-1 w-full"
+              className="px-3 py-2 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)]"
             />
           ) : (
             <p>{LeleInfo.ikanMati}</p>
@@ -283,13 +307,13 @@ const tambahJadwal = () => {
               </label>
               <div className="space-y-10 mt-1">
                 {jadwal.map((item, idx) => (
-                  <div key={idx} className="flex md:items-start space-x-2 flex-col md:flex-row gap-2 md:gap-0">
+                  <div key={idx} className="flex md:items-start space-x-2 flex-col md:flex-row gap-3 md:gap-0">
 
                   {/*==============================INPUT DESKRIPSI==================================================*/}
 
                     <input
                       type="text"
-                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full" 
                       value={item.deskripsi || ""}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -304,7 +328,7 @@ const tambahJadwal = () => {
 
                   {/*==============================INPUT HARI==================================================*/}
                     <select
-                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full"
                       value={item.hari}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -328,11 +352,12 @@ const tambahJadwal = () => {
 
                   {/*==============================INPUT PENGECUALIAN==================================================*/}
                     {item.hari === "Setiap Hari" && (
-                      <div className="border border-gray-400 px-3 py-1 rounded max-h-9.5 overflow-y-auto md:w-48 w-full">
+                      <div className=" px-3 py-1 max-h-16 md:max-h-16 overflow-y-auto md:w-48 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] overflow-hidden">
                         <p>Pengecualian:</p>
                         {hariOptions.map((h, i) => (
                           <label key={i} className="block">
                             <input
+              
                               type="checkbox"
                               checked={jadwal[idx]?.pengecualian?.includes(h) || false}
                               onChange={() => {
@@ -357,12 +382,12 @@ const tambahJadwal = () => {
                     )}
 
                   {/*==============================INPUT WAKTU MULAI==================================================*/}
-                  <div className='w-full md:w-auto flex justify-between md:justify-start gap-1'>
+                  <div className='w-full md:w-auto flex items-center justify-between md:justify-start gap-1'>
 
                     <input
                       type="time"
                       step="1"
-                      className="border border-gray-400 rounded px-2 py-1 w-34"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -381,7 +406,7 @@ const tambahJadwal = () => {
                     <input
                       type="time"
                       step="1"
-                      className="border border-gray-400 rounded px-2 py-1 w-34"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -401,7 +426,7 @@ const tambahJadwal = () => {
                       type="number"
                       min={0}
                       max={40}
-                      className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full"
                       value={item.pin}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
@@ -429,7 +454,7 @@ const tambahJadwal = () => {
 
                     <button
                       onClick={() => hapusJadwal(idx)}
-                      className="inline-flex items-center border-1 border-red-500 justify-center h-10 md:w-10 w-full rounded-md text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500"
+                      className="inline-flex items-center border-1 border-red-500 justify-center h-10 md:h-16 md:w-16 w-full rounded-xl text-red-500 hover:text-red-700 focus:outline-none focus:ring-1 focus:ring-red-500"
                       title="Hapus Jadwal"
                     >
                       <svg
@@ -455,12 +480,12 @@ const tambahJadwal = () => {
                 ))}
 
 {/*================================================NEW MODE=================================================================================*/}
-                <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-2 md:gap-0">
+                <div className="flex space-x-2 mt-3 md:items-center flex-col md:flex-row gap-3 md:gap-0">
 
                   {/*==============================INPUT DEKSRIPSI==================================================*/}
                   <input
                     type="text"
-                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full" 
                     value={newDeskripsi}
                     onChange={(e) => setNewDeskripsi(e.target.value)}
                     placeholder="Deskripsi jadwal"
@@ -468,7 +493,7 @@ const tambahJadwal = () => {
 
                   {/*==============================INPUT HARI==================================================*/}
                   <select
-                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                   className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full"
                     value={newHari}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -489,7 +514,7 @@ const tambahJadwal = () => {
                   
                   {/*==============================INPUT PENECUALIAN==================================================*/}         
                   {isSetiapHari && (
-                    <div className="border border-gray-400 px-3 py-1 rounded max-h-9.5 overflow-y-auto md:w-48 w-full">
+                    <div className=" px-3 py-1 max-h-16 md:max-h-16 overflow-y-auto md:w-48 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] overflow-hidden">
                       <p>Pengecualian:</p>
                       {hariOptions.map((h, i) => (
                         <label key={i} className="block">
@@ -515,7 +540,7 @@ const tambahJadwal = () => {
                   <input
                     type="time"
                     step="1"
-                    className="border border-gray-400 rounded px-2 py-1 w-34"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
@@ -528,7 +553,7 @@ const tambahJadwal = () => {
                   <input
                     type="time"
                     step="1"
-                    className="border border-gray-400 rounded px-2 py-1 w-34"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
@@ -542,7 +567,7 @@ const tambahJadwal = () => {
                     type="number"
                     min={0}
                     max={40}
-                    className="border border-gray-400 rounded px-2 py-1 md:w-48 w-full"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-full"
                     value={newPin}
                     onChange={(e) => {
                       setNewPin(e.target.value); // Selalu simpan input mentah dulu
@@ -575,7 +600,7 @@ const tambahJadwal = () => {
                                     
                   <button
                     onClick={tambahJadwal}
-                    className="inline-flex items-center justify-center h-10 md:w-10 w-full rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
+                    className="inline-flex items-center justify-center h-10 md:h-16 md:w-16 w-full rounded-xl border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-green-600"
                     aria-label="Tambah jadwal pakan"
                   >
                     <svg
