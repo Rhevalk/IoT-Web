@@ -23,7 +23,7 @@ export default async function AdminPage() {
   }
 
   return (
-    <div className="pb-18">
+    <div className="pb-24">
       <Menu opsi={menuOps}/>
 
       <div className="flex flex-col gap-6 p-6">

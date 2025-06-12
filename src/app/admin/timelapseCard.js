@@ -1,7 +1,8 @@
-/* eslint-disable @next/next/no-img-element */
+
 'use client';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { CentangIcon } from '@/components/ui/ToastIcons';
 
 export default function CamConfigManager() {
   const [configs, setConfigs] = useState([]);
@@ -34,7 +35,7 @@ export default function CamConfigManager() {
     });
     fetchConfigList();
     setIsEditing(false);
-		toast.error(`Config ${selectedCam} disimpan`);
+    toast.success(`Config ${selectedCam} disimpan`, { icon: <CentangIcon /> });
   };
 
   const handleCreateNew = async () => {
@@ -63,7 +64,7 @@ export default function CamConfigManager() {
       body: JSON.stringify(payload)
     });
     fetchConfigList();
-		toast.error(`Config ${newCamId} ditambahkan`);
+    toast.success(`Config ${newCamId} ditambahkan`, { icon: <CentangIcon /> });
   };
 
   const handleDelete = async () => {
@@ -73,7 +74,7 @@ export default function CamConfigManager() {
     setConfig({});
     setCam({});
     fetchConfigList();
-		toast.error(`Config ${selectedCam} dihapus`);
+    toast.success(`Config ${selectedCam} dihapus`, { icon: <CentangIcon /> });
   };
 
   const handleChange = (e, isCam = false) => {
@@ -117,19 +118,18 @@ export default function CamConfigManager() {
 
       <div className="flex gap-2 flex-wrap p-6">
         <select
-          className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:w-48 w-auto"
+          className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 md:w-48 w-auto"
           value={selectedCam || ''}
           onChange={(e) => fetchCamConfig(e.target.value)}
         >
-          <option value="">-- Pilih Kamera --</option>
+          <option value="">Pilih Kamera</option>
           {configs.map((camId) => (
             <option key={camId} value={camId}>{camId}</option>
           ))}
         </select>
 
 
-        <button onClick={() => handleCreateNew() } className="inline-flex items-center justify-center h-10 w-10 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all duration-200"
-          aria-label="Tambah jadwal pakan">
+        <button onClick={() => handleCreateNew() } className="inline-flex items-center justify-center h-10 w-10 md:h-16 md:w-16 rounded-md border border-green-600 bg-background text-green-600 hover:bg-accent hover:text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 transition-all duration-200">
 					<svg
         	  xmlns="http://www.w3.org/2000/svg"
         	  width="24"
@@ -140,7 +140,7 @@ export default function CamConfigManager() {
         	  strokeWidth="2"
         	  strokeLinecap="round"
         	  strokeLinejoin="round"
-        	  className="lucide lucide-circle-plus h-4 w-4"
+        	  className="lucide lucide-circle-plus h-6 w-6"
         	>
         	  <circle cx="12" cy="12" r="10"></circle>
         	  <path d="M8 12h8"></path>
@@ -165,7 +165,7 @@ export default function CamConfigManager() {
           	    strokeWidth="2"
           	    strokeLinecap="round"
           	    strokeLinejoin="round"
-          	    className="lucide lucide-trash2 h-4 w-4"
+          	    className="lucide lucide-trash2 h-6 w-6"
           	  >
           	    <path d="M3 6h18"></path>
           	    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
@@ -186,7 +186,7 @@ export default function CamConfigManager() {
 								  strokeWidth="2"
 								  strokeLinecap="round"
 								  strokeLinejoin="round"
-								  class="lucide lucide-save h-5 w-5"
+								  class="lucide lucide-save h-6 w-6"
 								>
 														
 								  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -209,7 +209,7 @@ export default function CamConfigManager() {
 								  strokeWidth="2"
 								  strokeLinecap="round"
 								  strokeLinejoin="round"
-								  className="lucide lucide-pen-line h-5 w-5"
+								  className="lucide lucide-pen-line h-6 w-6"
 								>
 								  <path d="M12 20h9" />
 								  <path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z" />

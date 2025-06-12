@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { CentangIcon } from '@/components/ui/ToastIcons';
 
 const hariOptions = [
   "Senin",
@@ -14,14 +15,13 @@ const hariOptions = [
   "Minggu",
 ];
 
-const protectedPins = [0, 2, 6, 7, 8, 9, 10, 11, 12, 15, 32, 33, 34, 35, 25, 26]; 
-
 export default function PlantInfoCard() {
   const [isEditing, setIsEditing] = useState(false);
   const [plantInfo, setPlantInfo] = useState({
     type: '--',
     plantingDate: '--:--',
     harvestDate: '--:--',
+    protectedPins: [],
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -39,8 +39,21 @@ export default function PlantInfoCard() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setPlantInfo((prev) => ({ ...prev, [name]: value }));
+
+    let updatedValue = value;
+
+    if (name === 'protectedPins') {
+      updatedValue = value
+        .split(',')
+        .map((v) => v.trim())
+        .filter((v) => v !== '')
+        .map((v) => parseInt(v, 10))
+        .filter((v) => !isNaN(v));
+    }
+
+    setPlantInfo((prev) => ({ ...prev, [name]: updatedValue }));
   };
+
 
   // Cek jadwal duplikat hari + start + end + pin
   const isDuplicate = (hari, start, end, pin) => {
@@ -84,6 +97,7 @@ const tambahJadwal = () => {
     setNewDeskripsi("");
     setExceptions([]);
     setIsSetiapHari(false);
+    toast.success('Jadwal berhasil dibuat', { icon: <CentangIcon /> });
   }
 };
 
@@ -91,6 +105,7 @@ const tambahJadwal = () => {
 
   const hapusJadwal = (idx) => {
     setJadwal((prev) => prev.filter((_, i) => i !== idx));
+    toast.success(`Jadwal ${idx + 1} berhasil dihapus`, { icon: <CentangIcon /> });
   };
 
   const data = {
@@ -106,6 +121,7 @@ const tambahJadwal = () => {
     setIsEditMode(false);
     sendToJson();
     console.log("Data disimpan:", { data });
+    toast.success('Data berhasil disimpan', { icon: <CentangIcon /> });
   };
   // fungsi simpan jadwal
   async function sendToJson() {
@@ -198,10 +214,10 @@ const tambahJadwal = () => {
 								  viewBox="0 0 24 24"
 								  fill="none"
 								  stroke="currentColor"
-								  stroke-width="2"
-								  stroke-linecap="round"
-								  stroke-linejoin="round"
-								  class="lucide lucide-save h-5 w-5"
+								  strokeWidth="2"
+								  strokeLinecap="round"
+								  strokeLinejoin="round"
+								  className="lucide lucide-save h-6 w-6"
 								>
 														
 								  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />												
@@ -260,6 +276,22 @@ const tambahJadwal = () => {
             />
           ) : (
             <p>{plantInfo.harvestDate}</p>
+          )}
+        </div>
+
+        {/* protect pins */}
+        <div>
+          <label className="text-xl font-semibold block mb-1">Proteksi Pin:</label>
+          {isEditing ? (
+            <input
+              type="text"
+              name="protectedPins"
+              value={plantInfo.protectedPins.join(', ')}
+              onChange={handleChange}
+              className="px-3 py-2 w-full hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)]"
+            />
+          ) : (
+            <p>{plantInfo.protectedPins.join(', ')}</p>
           )}
         </div>
 
@@ -432,7 +464,7 @@ const tambahJadwal = () => {
                       }}
                       onBlur={(e) => {
                         const val = parseInt(e.target.value, 10);
-                        if (protectedPins.includes(val)) {
+                        if (plantInfo.protectedPins.includes(val)) {
                           toast.error(`Pin ${val} diproteksi`);
                           setJadwal((prev) => {
                             const newJadwal = [...prev];
@@ -460,7 +492,7 @@ const tambahJadwal = () => {
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="lucide lucide-trash2 h-4 w-4"
+                        className="lucide lucide-trash2 h-6 w-6"
                       >
                         <path d="M3 6h18"></path>
                         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
@@ -529,7 +561,7 @@ const tambahJadwal = () => {
                   )}
 
                   {/*==============================INPUT WAKTU MULAI==================================================*/}  
-                <div className='w-full md:w-auto flex justify-between md:justify-start gap-1'>
+                <div className='w-full md:w-auto flex items-center justify-between md:justify-start gap-1'>
                   <input
                     type="time"
                     step="1"
@@ -578,7 +610,7 @@ const tambahJadwal = () => {
                         return;
                       }
                     
-                      if (protectedPins.includes(val)) {
+                      if (plantInfo.protectedPins.includes(val)) {
                         toast.error(`Pin ${val} diproteksi`);
                         // Tetap boleh nunjukin nilainya, tapi jangan dianggap valid
                         setNewPin("");
@@ -606,7 +638,7 @@ const tambahJadwal = () => {
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="lucide lucide-circle-plus h-4 w-4"
+                      className="lucide lucide-circle-plus h-6 w-6"
                     >
                       <circle cx="12" cy="12" r="10"></circle>
                       <path d="M8 12h8"></path>

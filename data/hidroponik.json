@@ -3,17 +3,17 @@
     "type": "Cabe",
     "plantingDate": "12 maret 1721",
     "harvestDate": "34 April 1231",
-    "jadwal": [
-      {
-        "hari": "Setiap Hari",
-        "pengecualian": [
-          "Kamis"
-        ],
-        "start": "04:09:24",
-        "end": "01:09:26",
-        "pin": 1,
-        "deskripsi": "ad"
-      }
-    ]
+    "protectedPins": [
+      0,
+      2,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "jadwal": []
   }
 }
