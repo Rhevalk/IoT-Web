@@ -50,7 +50,7 @@ export default function LeleInfoCard() {
         .filter((v) => !isNaN(v));
     }
 
-    setPlantInfo((prev) => ({ ...prev, [name]: updatedValue }));
+    setLeleInfo((prev) => ({ ...prev, [name]: updatedValue }));
   };
   // Cek jadwal duplikat hari + start + end + pin
   const isDuplicate = (hari, start, end, pin) => {

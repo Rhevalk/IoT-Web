@@ -52,7 +52,7 @@ export default function NilaInfoCard() {
         .filter((v) => !isNaN(v));
     }
 
-    setPlantInfo((prev) => ({ ...prev, [name]: updatedValue }));
+    setNilaInfo((prev) => ({ ...prev, [name]: updatedValue }));
   };
 
   // Cek jadwal duplikat hari + start + end + pin
