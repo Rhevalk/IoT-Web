@@ -412,7 +412,7 @@ const tambahJadwal = () => {
                     <input
                       type="time"
                       step="1"
-                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-38"
                       value={item.start}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -425,13 +425,11 @@ const tambahJadwal = () => {
                       title="Jam Mulai"
                     />
 
-                    <h1>--</h1>
-
                   {/*==============================INPUT WAKTU SELESAI==================================================*/}
                     <input
                       type="time"
                       step="1"
-                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
+                      className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-38"
                       value={item.end}
                       onChange={(e) => {
                         const val = e.target.value;
@@ -565,20 +563,18 @@ const tambahJadwal = () => {
                   <input
                     type="time"
                     step="1"
-                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-38"
                     value={newStartTime}
                     onChange={(e) => setNewStartTime(e.target.value)}
                     placeholder="Jam Mulai"
                     title="Jam Mulai"
                   />
 
-                  <h1>--</h1>
-
                   {/*==============================INPUT WAKTU SELESAI==================================================*/}  
                   <input
                     type="time"
                     step="1"
-                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-34"
+                    className="px-3 py-2 hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] md:h-16 w-38"
                     value={newEndTime}
                     onChange={(e) => setNewEndTime(e.target.value)}
                     placeholder="Jam Selesai"
