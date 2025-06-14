@@ -30,7 +30,10 @@ type JadwalItem = {
 };
 
 type ConfigItem = {
-  status: boolean;
+  status: {
+    status : boolean;
+    kondisi : string;
+  };
   cam: {
     id: string;
     name: string;
@@ -198,7 +201,7 @@ export default function Home() {
                     {configs.length > 0 ? (
                       configs.map((item, i) => (
                         <li key={i} className="flex items-center">
-                          <span className={`w-4 h-4 ${item.status ? "bg-green-400" : "bg-red-400"} inline-block mt-1 mr-2 rounded-sm`}></span>
+                          <span className={`w-4 h-4 ${item.status.kondisi == "Aktif" ? "bg-green-400" : item.status.kondisi == "Non-Aktif" ? "bg-red-400" : "bg-yellow-400"} inline-block mt-1 mr-2 rounded-sm`}></span>
 
                           <h1><strong>{item.cam.name}</strong> {`(${item.cam.id})`}</h1>
                         </li>

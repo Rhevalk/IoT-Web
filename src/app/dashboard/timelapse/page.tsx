@@ -13,7 +13,10 @@ const menuOps = [
 ];
 
 type ConfigItem = {
-  status: boolean;
+  status: {
+    status : boolean;
+    kondisi : string;
+  };
   cam: {
     id: string;
     name: string;
@@ -33,12 +36,12 @@ type videosItems = {
 export default function Log() {  
   
   const [configs, setConfigs] = useState<ConfigItem[]>([]);
-    useEffect(() => {
-      fetch('/api/config')
-        .then(res => res.json())
-        .then(data => setConfigs(data))
-        .catch(err => console.error('Gagal ambil semua config:', err));
-    }, []);
+  useEffect(() => {
+    fetch('/api/config')
+      .then(res => res.json())
+      .then(data => setConfigs(data))
+      .catch(err => console.error('Gagal ambil semua config:', err));
+  }, []);
 
   const [videos, setVideos] = useState<videosItems[]>([]);
     useEffect(() => {
@@ -79,7 +82,7 @@ export default function Log() {
                     {configs.length > 0 ? (
                       configs.map((item, i) => (
                         <li key={i} className="flex items-center">
-                          <span className={`w-4 h-4 ${item.status ? "bg-green-400" : "bg-red-400"} inline-block mt-1 mr-2 rounded-sm`}></span>
+                          <span className={`w-4 h-4 ${item.status.kondisi == "Aktif" ? "bg-green-400" : item.status.kondisi == "Non-Aktif" ? "bg-red-400" : "bg-yellow-400"} inline-block mt-1 mr-2 rounded-sm`}></span>
 
                           <h1><strong>{item.cam.name}</strong> {`(${item.config.start_date} -- ${item.config.end_date})`}</h1>
                         </li>

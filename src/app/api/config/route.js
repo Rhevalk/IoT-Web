@@ -7,6 +7,16 @@ const CONFIG_DIR = path.join(process.cwd(), 'configs');
 function getConfigFilePath(camId) {
   return path.join(CONFIG_DIR, `${camId}.json`);
 }
+function getKondisi(updatedAtStr) {
+  const updatedAt = new Date(updatedAtStr);
+  const now = new Date();
+  const selisihMs = now - updatedAt;
+
+  if (selisihMs < 5000) return 'Aktif';
+  if (selisihMs < 60000) return 'Pending';
+  return 'Non-Aktif';
+}
+
 
 // ✅ POST: ESP32 kirim status dan minta config
 export async function POST(req) {
@@ -34,10 +44,11 @@ export async function POST(req) {
 
     fs.writeFileSync(cfgPath, JSON.stringify(configJson, null, 2));
 
-    return NextResponse.json({
-      message: 'Status diterima, ini config-nya',
-      config: configJson,
-    });
+  return NextResponse.json({
+      config : configJson.config,
+      cam: configJson.cam,
+  });
+  
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 });
@@ -55,18 +66,50 @@ export async function GET(req) {
       if (!fs.existsSync(filePath)) {
         return NextResponse.json({ error: 'Config tidak ditemukan' }, { status: 404 });
       }
+
       const data = fs.readFileSync(filePath, 'utf-8');
       const configJson = JSON.parse(data);
+
+      const updatedAt = configJson?.status?.updatedAt;
+      const kondisi = updatedAt ? getKondisi(updatedAt) : 'Non-Aktif';
+
+      if (!configJson.status) {
+        configJson.status = {
+          status: false,
+          updatedAt: null,
+          kondisi
+        };
+      } else {
+        configJson.status.kondisi = kondisi;
+      }
+
+      configJson.camId = camId;
+
       return NextResponse.json(configJson);
     } else {
       // GET all
       const files = fs.readdirSync(CONFIG_DIR).filter(f => f.endsWith('.json'));
       const configs = files.map(file => {
-        const camId = path.basename(file, '.json');
         const data = fs.readFileSync(path.join(CONFIG_DIR, file), 'utf-8');
         const json = JSON.parse(data);
-        return { camId, ...json };
+
+        const updatedAt = json?.status?.updatedAt;
+        const kondisi = updatedAt ? getKondisi(updatedAt) : 'Non-Aktif';
+
+        if (!json.status) {
+          json.status = {
+            status: false,
+            updatedAt: null,
+            kondisi
+          };
+        } else {
+          json.status.kondisi = kondisi;
+        }
+
+        json.camId = path.basename(file, '.json');
+        return json;
       });
+
       return NextResponse.json(configs);
     }
   } catch (err) {
@@ -74,6 +117,8 @@ export async function GET(req) {
     return NextResponse.json({ error: 'Gagal membaca config.' }, { status: 500 });
   }
 }
+
+
 
 // ✅ PUT: Simpan update config dan status
 export async function PUT(req) {

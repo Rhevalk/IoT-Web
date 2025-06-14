@@ -4,6 +4,31 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { CentangIcon } from '@/components/ui/ToastIcons';
 
+const labelMap = {
+  fps: "FPS",
+  max_images: "Max Gambar",
+  interval_seconds: "Interval (detik)",
+  start_hour: "Jam Mulai",
+  end_hour: "Jam Selesai",
+  start_date: "Tanggal Mulai",
+  end_date: "Tanggal Selesai",
+  flash: "Flash",
+
+  id: "ID Kamera",
+  name: "Nama Kamera",
+  power: "Status Power",
+
+  status: "Status",
+  updatedAt: "Terakhir Update",
+  kondisi: "Kondisi"
+};
+
+// fallback: ganti snake_case jadi Kapitalisasi
+const toLabel = (key) => {
+  return labelMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+};
+
+
 export default function CamConfigManager() {
 const [configs, setConfigs] = useState([]);
 const [selectedCam, setSelectedCam] = useState(null);
@@ -233,13 +258,13 @@ useEffect(() => {
           <h3 className="font-semibold">Config</h3>
           {Object.entries(config).map(([key, val]) => (
             <div key={key} className='hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.15)] flex items-center justify-between px-3 py-2'>
-              <label className="block capitalize">{key}:</label>
+              <label className="block capitalize">{toLabel(key)}:</label>
               {typeof val === 'boolean' ? (
 							<label className="relative inline-block w-[48px] h-[28px]">
 							  <input
 							    type="checkbox"
 							    className="peer opacity-0 w-0 h-0"
-							    name={key}
+							    name={toLabel(key)}
 							    checked={val}
 							    disabled={!isEditing}	
 							    onChange={(e) => handleChange(e, false)}
@@ -271,13 +296,13 @@ useEffect(() => {
           <h3 className="font-semibold">Cam</h3>
           {Object.entries(cam).map(([key, val]) => (
             <div key={key} className='hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.15)] g flex items-center justify-between px-3 py-2'>
-              <label className="block capitalize">{key}:</label>
+              <label className="block capitalize">{toLabel(key)}:</label>
               {typeof val === 'boolean' ? (
 							<label className="relative inline-block w-[48px] h-[28px]">
 							  <input
 							    type="checkbox"
 							    className="peer opacity-0 w-0 h-0"
-							    name={key}
+							    name={toLabel(key)}
 							    checked={val}
 							    disabled={!isEditing}	
 							    onChange={(e) => handleChange(e, true)}
@@ -294,7 +319,7 @@ useEffect(() => {
 
               ) : (
                 <input
-                  name={key}
+                  name={toLabel(key)}
                   value={val}
                   type="text"
                   disabled={!isEditing || key === 'id'}
