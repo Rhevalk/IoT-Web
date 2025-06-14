@@ -5,91 +5,96 @@ import { toast } from 'react-toastify';
 import { CentangIcon } from '@/components/ui/ToastIcons';
 
 export default function CamConfigManager() {
-  const [configs, setConfigs] = useState([]);
-  const [selectedCam, setSelectedCam] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [config, setConfig] = useState({});
-  const [cam, setCam] = useState({});
+const [configs, setConfigs] = useState([]);
+const [selectedCam, setSelectedCam] = useState(null);
+const [isEditing, setIsEditing] = useState(false);
+const [config, setConfig] = useState({});
+const [cam, setCam] = useState({});
 
-  const fetchConfigList = async () => {
-    const res = await fetch('/api/config-handler');
-    const data = await res.json();
-    setConfigs(data.cams);
-  };
+const fetchConfigList = async () => {
+  const res = await fetch(`/api/config-handler?ts=${Date.now()}`);
+  const data = await res.json();
+  setConfigs(data.cams);
+};
 
-  const fetchCamConfig = async (camId) => {
-    const res = await fetch(`/api/config-handler?file=${camId}`);
-    const data = await res.json();
-    setSelectedCam(camId);
-    setConfig(data.config || {});
-    setCam(data.cam || {});
-    setIsEditing(false);
-  };
+const fetchCamConfig = async (camId) => {
+  const res = await fetch(`/api/config-handler?file=${camId}&ts=${Date.now()}`);
+  const data = await res.json();
+  setSelectedCam(camId);
+  setConfig(data.config || {});
+  setCam(data.cam || {});
+  setIsEditing(false);
+};
 
-  const handleSave = async () => {
-    const payload = { config, cam };
-    await fetch(`/api/config-handler?file=${selectedCam}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    fetchConfigList();
-    setIsEditing(false);
-    toast.success(`Config ${selectedCam} disimpan`, { icon: <CentangIcon /> });
-  };
+const handleSave = async () => {
+  const payload = { config, cam };
+  await fetch(`/api/config-handler?file=${selectedCam}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  await fetchCamConfig(selectedCam); // <--- Refresh data agar sinkron
+  await fetchConfigList();           // Optional: jika nama atau jumlah kamera berubah
+  setIsEditing(false);
+  toast.success(`Config ${selectedCam} disimpan`, { icon: <CentangIcon /> });
+};
 
-  const handleCreateNew = async () => {
-    const nextId = configs.length + 1;
-    const newCamId = `cam${nextId}`;
-    const payload = {
-      config: {
-        fps: 1,
-        max_images: 10,
-        interval_seconds: 10,
-        start_hour: 0,
-        end_hour: 24,
-        start_date: '',
-        end_date: '',
-        flash: false
-      },
-      cam: {
-        power: true,
-        id: newCamId,
-        name: `Kamera ${nextId}`
-      }
-    };
-    await fetch(`/api/config-handler?file=${newCamId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    fetchConfigList();
-    toast.success(`Config ${newCamId} ditambahkan`, { icon: <CentangIcon /> });
-  };
-
-  const handleDelete = async () => {
-    if (!selectedCam) return;
-    await fetch(`/api/config-handler?file=${selectedCam}`, { method: 'DELETE' });
-    setSelectedCam(null);
-    setConfig({});
-    setCam({});
-    fetchConfigList();
-    toast.success(`Config ${selectedCam} dihapus`, { icon: <CentangIcon /> });
-  };
-
-  const handleChange = (e, isCam = false) => {
-    const { name, value, type, checked } = e.target;
-    const update = type === 'checkbox' ? checked : value;
-    if (isCam) {
-      setCam(prev => ({ ...prev, [name]: update }));
-    } else {
-      setConfig(prev => ({ ...prev, [name]: type === 'number' ? parseInt(update) : update }));
+const handleCreateNew = async () => {
+  const nextId = configs.length + 1;
+  const newCamId = `cam${nextId}`;
+  const payload = {
+    config: {
+      fps: 1,
+      max_images: 10,
+      interval_seconds: 10,
+      start_hour: 0,
+      end_hour: 24,
+      start_date: '',
+      end_date: '',
+      flash: false
+    },
+    cam: {
+      power: true,
+      id: newCamId,
+      name: `Kamera ${nextId}`
     }
   };
+  await fetch(`/api/config-handler?file=${newCamId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  await fetchConfigList();
+  toast.success(`Config ${newCamId} ditambahkan`, { icon: <CentangIcon /> });
+};
 
-  useEffect(() => {
-    fetchConfigList();
-  }, []);
+const handleDelete = async () => {
+  if (!selectedCam) return;
+  await fetch(`/api/config-handler?file=${selectedCam}`, { method: 'DELETE' });
+  setSelectedCam(null);
+  setConfig({});
+  setCam({});
+  await fetchConfigList();
+  toast.success(`Config ${selectedCam} dihapus`, { icon: <CentangIcon /> });
+};
+
+const handleChange = (e, isCam = false) => {
+  const { name, value, type, checked } = e.target;
+  const update = type === 'checkbox' ? checked : value;
+  if (isCam) {
+    setCam(prev => ({ ...prev, [name]: update }));
+  } else {
+    setConfig(prev => ({
+      ...prev,
+      [name]: type === 'number' ? parseInt(update) : update
+    }));
+  }
+};
+
+useEffect(() => {
+  fetchConfigList();
+}, []);
+
 
   return (
     <div className="hover:bg-[#f7f7f7] rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.15)] w-full mx-auto overflow-hidden text-[#424242]">
@@ -152,7 +157,7 @@ export default function CamConfigManager() {
           <>
           	<button
           	  onClick={() => handleDelete()}
-          	  className="inline-flex items-center border-1 border-red-500 justify-center h-10 w-10 rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200"
+          	  className="inline-flex items-center border-1 border-red-500 justify-center h-10 w-10 md:h-16 md:w-16 rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200"
           	  title="Hapus Jadwal"
           	>
           	  <svg
@@ -175,7 +180,7 @@ export default function CamConfigManager() {
           	  </svg>
           	</button>
             {isEditing ? (
-              <button onClick={handleSave} className="bg-green-600 text-white px-3 py-1 rounded">
+              <button onClick={handleSave} className="inline-flex items-center justify-center bg-green-600 h-10 w-10 md:h-16 md:w-16 text-white px-3 py-1 rounded">
 								<svg
 								  xmlns="http://www.w3.org/2000/svg"
 								  width="24"
@@ -186,7 +191,7 @@ export default function CamConfigManager() {
 								  strokeWidth="2"
 								  strokeLinecap="round"
 								  strokeLinejoin="round"
-								  class="lucide lucide-save h-6 w-6"
+								  className="lucide lucide-save h-6 w-6"
 								>
 														
 								  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
@@ -198,7 +203,7 @@ export default function CamConfigManager() {
 														
 							</button>
             ) : (
-              <button onClick={() => setIsEditing(true)} className="flex not-last:h-10 w-10 border items-center justify-center rounded-md border-green-600 text-green-600 hover:text-green-700">                
+              <button onClick={() => setIsEditing(true)} className="flex h-10 w-10 md:h-16 md:w-16 border items-center justify-center rounded-md border-green-600 text-green-600 hover:text-green-700">                
 								<svg
 								  xmlns="http://www.w3.org/2000/svg"
 								  width="24"
@@ -237,7 +242,7 @@ export default function CamConfigManager() {
 							    name={key}
 							    checked={val}
 							    disabled={!isEditing}	
-							    onChange={handleChange}
+							    onChange={(e) => handleChange(e, false)}
 							  />
 							  <span
 							    className="absolute top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition
@@ -253,10 +258,10 @@ export default function CamConfigManager() {
               ) : (
                 <input
                   name={key}
-                  value={val}
+                  value={Number.isNaN(val) ? '' : val}
                   type={typeof val === 'number' ? 'number' : 'text'}
                   disabled={!isEditing}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange(e, false)}
                   className="px-2 py-1 rounded w-26 text-right"
                 />
               )}
@@ -275,7 +280,7 @@ export default function CamConfigManager() {
 							    name={key}
 							    checked={val}
 							    disabled={!isEditing}	
-							    onChange={handleChange}
+							    onChange={(e) => handleChange(e, true)}
 							  />
 							  <span
 							    className="absolute top-0 left-0 right-0 bottom-0 bg-gray-300 rounded-full transition

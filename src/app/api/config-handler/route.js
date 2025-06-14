@@ -33,6 +33,8 @@ export async function PUT(req) {
     const filePath = getFilePath(fileParam);
     const body = await req.json();
 
+        console.log('📄 File path PUT:', filePath); // Di dalam PUT
+
     // Baca data lama jika ada
     let existingData = {};
     if (fs.existsSync(filePath)) {
@@ -40,11 +42,13 @@ export async function PUT(req) {
       if (content) existingData = JSON.parse(content);
     }
 
+
     const newData = {
       ...existingData,
-      ...(body.config && { config: { ...(existingData.config || {}), ...body.config } }),
-      ...(body.cam && { cam: { ...(existingData.cam || {}), ...body.cam } })
+      ...(body.config && { config: body.config }),
+      ...(body.cam && { cam: body.cam })
     };
+
 
     fs.writeFileSync(filePath, JSON.stringify(newData, null, 2));
 
@@ -114,7 +118,10 @@ export async function GET(req) {
       return new Response(JSON.stringify({ error: 'Config tidak ditemukan' }), { status: 404 });
     }
 
+
+
     const content = fs.readFileSync(filePath, 'utf-8');
+    console.log('📤 Isi file di GET:', content);
     return new Response(content, { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {

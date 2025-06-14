@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
+/*-----------------------------------------
+# URL GET
+# /api/video-get
+-----------------------------------------*/
+
 export async function GET() {
   const videosDir = path.join(process.cwd(), 'public', 'videos');
 

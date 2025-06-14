@@ -7,6 +7,11 @@ from PIL import Image
 
 app = Flask(__name__)
 
+
+#//////////////////////////
+# URL POST(UPLOAD)
+# /upload/<index != 0>
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CONFIG_DIR = os.path.join(BASE_DIR, 'configs')
 PUBLIC_DIR = os.path.join(BASE_DIR, 'public', 'videos')

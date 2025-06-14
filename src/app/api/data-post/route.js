@@ -1,5 +1,13 @@
 let dataMap = new Map(); // Menyimpan data terakhir per post
 
+/*-----------------------------------------
+# URL POST
+# /api/data-post?file=<kolam-ikan | hidroponik>
+#
+# URL GET
+# /api/data-post?file=<kolam-ikan | hidroponik>
+-----------------------------------------*/
+
 export async function POST(request) {
   const { searchParams } = new URL(request.url);
   const post = searchParams.get("file");

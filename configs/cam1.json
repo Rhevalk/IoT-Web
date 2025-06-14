@@ -5,8 +5,8 @@
     "interval_seconds": 10,
     "start_hour": 0,
     "end_hour": 24,
-    "start_date": "1 Juni 2025",
-    "end_date": "15 Juni 2025",
+    "start_date": "",
+    "end_date": "",
     "flash": true
   },
   "cam": {

@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
+/*-----------------------------------------
+# URL GET
+# /api/data-get?file=<kolam-ikan | hidroponik>
+-----------------------------------------*/
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const fileName = searchParams.get('file');

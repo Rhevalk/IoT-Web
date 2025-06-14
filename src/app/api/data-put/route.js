@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { URL } from 'url';
 
+/*-----------------------------------------
+# URL PUT
+# /api/data-put?file=<kolam-ikan | hidroponik>
+-----------------------------------------*/
+
 export async function PUT(req) {
   try {
     const { searchParams } = new URL(req.url);
