@@ -2,11 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
-/*-----------------------------------------
-# URL GET
-# /api/video-get
------------------------------------------*/
-
 export async function GET() {
   const videosDir = path.join(process.cwd(), 'public', 'videos');
 
@@ -19,17 +14,26 @@ export async function GET() {
 
   const result = camFolders.map(camId => {
     const camPath = path.join(videosDir, camId);
-    const files = fs.readdirSync(camPath)
-      .filter(f => !f.toLowerCase().includes('frames'))
-      .filter(f => f.endsWith('.mp4') || f.endsWith('.jpeg'));
+    const allFiles = fs.readdirSync(camPath);
 
-    const videos = files.filter(f => f.endsWith('.mp4')).map(f => `/videos/${camId}/${f}`);
-    const thumbnails = files.filter(f => f.endsWith('.jpeg')).map(f => `/videos/${camId}/${f}`);
+    // File video dan thumbnail
+    const videoFiles = allFiles.filter(f => f.endsWith('.mp4'));
+    const thumbFiles = allFiles.filter(f => f.endsWith('.jpeg'));
+
+    // Folder frames
+    const framesPath = path.join(camPath, 'frames');
+    let frames = [];
+    if (fs.existsSync(framesPath)) {
+      frames = fs.readdirSync(framesPath);
+    }
 
     return {
       camId,
-      videos,
-      thumbnails
+      videos: videoFiles.map(f => `/videos/${camId}/${f}`),
+      thumbnails: thumbFiles.map(f => `/videos/${camId}/${f}`),
+      frames: {
+        count: frames.length,
+      }
     };
   });
 

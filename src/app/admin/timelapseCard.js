@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 
 'use client';
 import { useState, useEffect } from 'react';
@@ -35,6 +37,7 @@ const [selectedCam, setSelectedCam] = useState(null);
 const [isEditing, setIsEditing] = useState(false);
 const [config, setConfig] = useState({});
 const [cam, setCam] = useState({});
+const [video, setVideo] = useState([]);
 
 const fetchConfigList = async () => {
   const res = await fetch(`/api/config-handler?ts=${Date.now()}`);
@@ -62,6 +65,8 @@ const handleSave = async () => {
   await fetchConfigList();           // Optional: jika nama atau jumlah kamera berubah
   setIsEditing(false);
   toast.success(`Config ${selectedCam} disimpan`, { icon: <CentangIcon /> });
+  fetchVideo();
+  fetchVideo();
 };
 
 const handleCreateNew = async () => {
@@ -119,6 +124,45 @@ const handleChange = (e, isCam = false) => {
 useEffect(() => {
   fetchConfigList();
 }, []);
+
+const fetchVideo = async () => {
+  const res = await fetch("/api/video-get");
+  const data = await res.json();
+  setVideo(data);
+};
+
+useEffect(() => {
+  fetchVideo();
+}, []);
+
+const handleDeleteFrames = async (camId) => {
+  const res = await fetch(`/api/video-delete?camId=${camId}&target=frames`, {
+    method: 'DELETE',
+  });
+
+  if (res.ok) {
+    toast.success(`Frames berhasil dihapus`, { icon: <CentangIcon /> });
+  } else {
+    toast.error(`Frames gagal dihapus`);
+  }
+  fetchVideo();
+};
+
+const handleDeleteFile = async (camId, fileName) => {
+  console.log(fileName);
+  const res = await fetch(`/api/video-delete?camId=${camId}&target=file&file=${fileName}`, {
+    method: 'DELETE',
+  });
+
+  if (res.ok) {
+    toast.success(`Video berhasil dihapus`, { icon: <CentangIcon /> });
+  } else {
+    toast.error(`Video gagal dihapus`);
+  }
+  fetchVideo();
+};
+
+
 
 
   return (
@@ -252,7 +296,7 @@ useEffect(() => {
       </div>
 
       {selectedCam && (
-        <div className="space-y-3 p-6">
+        <div className="space-y-3 p-6 ">
           <h2 className="text-xl font-semibold">Konfigurasi: {selectedCam}</h2>
 
           <h3 className="font-semibold">Config</h3>
@@ -329,6 +373,101 @@ useEffect(() => {
               )}
             </div>
           ))}
+
+          <h3 className="font-semibold">File</h3>
+          {video.map((cam, idx) => (
+            <div key={idx} className='hover:bg-[#f7f7f7] rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.15)] g flex items-center justify-between px-3 py-2'>
+              <label>Frames: {cam.frames.count}</label>
+                
+                {isEditing ? (                    
+                      <button
+          	          onClick={() => handleDeleteFrames(cam.camId)}
+          	          className={`inline-flex items-center border-1 border-red-500 justify-center h-10 w-10 md:h-8 md:w-8 rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200`}
+          	          title="Hapus Jadwal"
+          	        >
+          	          <svg
+          	            xmlns="http://www.w3.org/2000/svg"
+          	            width="24"
+          	            height="24"
+          	            viewBox="0 0 24 24"
+          	            fill="none"
+          	            stroke="currentColor"
+          	            strokeWidth="2"
+          	            strokeLinecap="round"
+          	            strokeLinejoin="round"
+          	            className="lucide lucide-trash2 h-4 w-4"
+          	          >
+          	            <path d="M3 6h18"></path>
+          	            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          	            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+          	            <line x1="10" x2="10" y1="11" y2="17"></line>
+          	            <line x1="14" x2="14" y1="11" y2="17"></line>
+          	          </svg>
+          	        </button>
+                    ) : (
+                      <div></div>
+                    )
+                    }
+            </div>
+          ))}
+
+          <h3 className="font-semibold">Video</h3>
+          {video.map((cam, idx) => (
+            <div key={idx}>
+              <div className='
+                  hover:bg-[#f7f7f7]
+                  rounded-xl
+                  shadow-[0_2px_8px_rgba(0,0,0,0.15)]
+                  flex flex-wrap items-center justify-between
+                  px-3 py-2
+                  overflow-hidden
+                  w-full
+                  max-w-full
+                '>
+              {cam.thumbnails.length > 0 ? (
+                cam.thumbnails.map((vid, vidIdx) => (
+                    <div key={vidIdx}>
+
+                    <img className={`h-32 w-32 rounded-xl mb-2`} src={vid}/>
+                      {isEditing ? (                    
+                        <button
+          	            onClick={() => handleDeleteFile(cam.camId, vidIdx)}
+          	            className={`mb-6 inline-flex items-center border-1 border-red-500 justify-center h-8 w-full rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200`}
+          	            title="Hapus Jadwal"
+          	          >
+          	            <svg
+          	              xmlns="http://www.w3.org/2000/svg"
+          	              width="24"
+          	              height="24"
+          	              viewBox="0 0 24 24"
+          	              fill="none"
+          	              stroke="currentColor"
+          	              strokeWidth="2"
+          	              strokeLinecap="round"
+          	              strokeLinejoin="round"
+          	              className="lucide lucide-trash2 h-4 w-4"
+          	            >
+          	              <path d="M3 6h18"></path>
+          	              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          	              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+          	              <line x1="10" x2="10" y1="11" y2="17"></line>
+          	              <line x1="14" x2="14" y1="11" y2="17"></line>
+          	            </svg>
+          	          </button>
+                      ) : 
+                      (
+                        <div></div>
+                      )}
+                    </div>
+                ))
+              ) : (
+                  <h3>Video: 0</h3>
+              )}
+              </div>
+            </div>
+          ))}
+
+          
         </div>
       )}
     </div>
