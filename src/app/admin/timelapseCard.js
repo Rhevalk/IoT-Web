@@ -128,8 +128,16 @@ useEffect(() => {
 const fetchVideo = async () => {
   const res = await fetch("/api/video-get");
   const data = await res.json();
-  setVideo(data);
+  console.log("Video data:", data);
+
+  if (Array.isArray(data)) {
+    setVideo(data);
+  } else {
+    console.error("🚫 Data video bukan array!", data);
+    setVideo([]); // fallback agar tidak error
+  }
 };
+
 
 useEffect(() => {
   fetchVideo();
@@ -412,60 +420,63 @@ const handleDeleteFile = async (camId, fileName) => {
           ))}
 
           <h3 className="font-semibold">Video</h3>
-          {video.map((cam, idx) => (
-            <div key={idx}>
-              <div className='
-                  hover:bg-[#f7f7f7]
-                  rounded-xl
-                  shadow-[0_2px_8px_rgba(0,0,0,0.15)]
-                  flex flex-wrap items-center justify-between
-                  px-3 py-2
-                  overflow-hidden
-                  w-full
-                  max-w-full
-                '>
-              {cam.thumbnails.length > 0 ? (
-                cam.thumbnails.map((vid, vidIdx) => (
-                    <div key={vidIdx}>
-
-                    <img className={`h-32 w-32 rounded-xl mb-2`} src={vid}/>
-                      {isEditing ? (                    
-                        <button
-          	            onClick={() => handleDeleteFile(cam.camId, vidIdx)}
-          	            className={`mb-6 inline-flex items-center border-1 border-red-500 justify-center h-8 w-full rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200`}
-          	            title="Hapus Jadwal"
-          	          >
-          	            <svg
-          	              xmlns="http://www.w3.org/2000/svg"
-          	              width="24"
-          	              height="24"
-          	              viewBox="0 0 24 24"
-          	              fill="none"
-          	              stroke="currentColor"
-          	              strokeWidth="2"
-          	              strokeLinecap="round"
-          	              strokeLinejoin="round"
-          	              className="lucide lucide-trash2 h-4 w-4"
-          	            >
-          	              <path d="M3 6h18"></path>
-          	              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-          	              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-          	              <line x1="10" x2="10" y1="11" y2="17"></line>
-          	              <line x1="14" x2="14" y1="11" y2="17"></line>
-          	            </svg>
-          	          </button>
-                      ) : 
-                      (
-                        <div></div>
-                      )}
-                    </div>
-                ))
+{Array.isArray(video) && video.length > 0 ? (
+  video.map((cam, idx) => (
+    <div key={idx}>
+      <div className='
+        hover:bg-[#f7f7f7]
+        rounded-xl
+        shadow-[0_2px_8px_rgba(0,0,0,0.15)]
+        flex flex-wrap items-center justify-between
+        px-3 py-2
+        overflow-hidden
+        w-full
+        max-w-full
+      '>
+        {Array.isArray(cam.thumbnails) && cam.thumbnails.length > 0 ? (
+          cam.thumbnails.map((vid, vidIdx) => (
+            <div key={vidIdx}>
+              <img className={`h-32 w-32 rounded-xl mb-2`} src={vid} />
+              {isEditing ? (
+                <button
+                  onClick={() => handleDeleteFile(cam.camId, vidIdx)}
+                  className={`mb-6 inline-flex items-center border-1 border-red-500 justify-center h-8 w-full rounded-md text-red-500 hover:text-white hover:bg-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 transition-all duration-200`}
+                  title="Hapus Jadwal"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-trash2 h-4 w-4"
+                  >
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    <line x1="10" x2="10" y1="11" y2="17"></line>
+                    <line x1="14" x2="14" y1="11" y2="17"></line>
+                  </svg>
+                </button>
               ) : (
-                  <h3>Video: 0</h3>
+                <div></div>
               )}
-              </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <h3>Video: 0</h3>
+        )}
+      </div>
+    </div>
+  ))
+) : (
+  <p className="text-gray-500">Tidak ada data video.</p>
+)}
+
 
           
         </div>
